@@ -1,0 +1,289 @@
+# Configuration du serveur proxy principal
+server {
+    listen 80;
+    server_name localhost;
+
+    # Lire le body des requêtes pour le logging
+    # IMPORTANT: Limite à 10MB pour éviter les problèmes de mémoire
+    client_body_buffer_size 128k;
+    client_max_body_size 10m;
+
+    # Headers de proxy communs
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header X-Request-ID $request_id;
+
+    # Support WebSocket
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection $connection_upgrade;
+
+    # Timeouts
+    proxy_connect_timeout 60s;
+    proxy_send_timeout 60s;
+    proxy_read_timeout 60s;
+
+    # ================================
+    # Service RAG (webhook via ngrok)
+    # ================================
+    location /api/rag/ {
+        # Proxy vers le service RAG (ngrok)
+        resolver 8.8.8.8 8.8.4.4 valid=300s;
+        resolver_timeout 5s;
+
+        # Définir la variable backend
+        set $rag_backend "${RAG_UPSTREAM_URL}";
+
+        # Suppression du préfixe /api/rag/ et transmission
+        rewrite ^/api/rag/(.*)$ /$1 break;
+        rewrite ^/api/rag$ / break;
+
+        proxy_pass $rag_backend;
+        proxy_ssl_server_name on;
+
+        # Headers spécifiques
+        proxy_set_header Host $proxy_host;
+
+        # Logs
+        access_log /var/log/nginx/rag-access.log json_api;
+        error_log /var/log/nginx/rag-error.log warn;
+    }
+
+    # ================================
+    # Service Braintrust (API logging)
+    # ================================
+    location /api/braintrust/ {
+        resolver 8.8.8.8 8.8.4.4 valid=300s;
+        resolver_timeout 5s;
+
+        # Définir la variable backend
+        set $braintrust_backend "https://api.braintrust.dev";
+
+        # Suppression du préfixe /api/braintrust/ et ajout de /v1/
+        rewrite ^/api/braintrust/(.*)$ /v1/$1 break;
+        rewrite ^/api/braintrust$ /v1/ break;
+
+        # Proxy vers Braintrust API
+        proxy_pass $braintrust_backend;
+        proxy_ssl_server_name on;
+
+        # Headers spécifiques incluant l'authentification
+        proxy_set_header Host api.braintrust.dev;
+        proxy_set_header Authorization "Bearer ${BRAINTRUST_API_KEY}";
+
+        # Logs
+        access_log /var/log/nginx/braintrust-access.log json_api;
+        error_log /var/log/nginx/braintrust-error.log warn;
+    }
+
+    # ================================
+    # Service SupaBase (API REST)
+    # ================================
+    location /api/supabase/ {
+        # Proxy vers SupaBase
+        resolver 8.8.8.8 8.8.4.4 valid=300s;
+        resolver_timeout 5s;
+
+        # Définir la variable backend
+        set $supabase_backend "${SUPABASE_URL}";
+
+        # Suppression du préfixe /api/supabase/ et ajout de /rest/v1/
+        rewrite ^/api/supabase/(.*)$ /rest/v1/$1 break;
+        rewrite ^/api/supabase$ /rest/v1/ break;
+
+        proxy_pass $supabase_backend;
+        proxy_ssl_server_name on;
+
+        # Headers spécifiques
+        proxy_set_header Host $proxy_host;
+        proxy_set_header apikey "${SUPABASE_API_KEY}";
+        proxy_set_header Authorization "Bearer ${SUPABASE_API_KEY}";
+
+        # Logs
+        access_log /var/log/nginx/supabase-access.log json_api;
+        error_log /var/log/nginx/supabase-error.log warn;
+    }
+
+    # ================================
+    # Google Analytics - Measurement Protocol (GA4)
+    # ================================
+    location /api/ga/mp/collect {
+        # Proxy vers Google Analytics Measurement Protocol
+        resolver 8.8.8.8 8.8.4.4 valid=300s;
+        resolver_timeout 5s;
+
+        # Définir la variable backend avec credentials
+        set $ga_mp_backend "https://www.google-analytics.com";
+
+        # Construire l'URL avec les paramètres d'authentification
+        set $ga_query "measurement_id=${GOOGLE_ANALYTICS_MEASUREMENT_ID}&api_secret=${GOOGLE_ANALYTICS_API_SECRET}";
+
+        # Si des paramètres existent déjà, les ajouter
+        if ($args != "") {
+            set $ga_query "${ga_query}&${args}";
+        }
+
+        # Proxy vers GA avec les credentials
+        proxy_pass $ga_mp_backend/mp/collect?$ga_query;
+        proxy_ssl_server_name on;
+
+        # Headers spécifiques
+        proxy_set_header Host www.google-analytics.com;
+        proxy_set_header Content-Type application/json;
+
+        # Logs
+        access_log /var/log/nginx/ga-mp-access.log json_api;
+        error_log /var/log/nginx/ga-mp-error.log warn;
+    }
+
+    # Alternative: /api/ga/mp/debug pour le mode debug
+    location /api/ga/mp/debug {
+        # Proxy vers Google Analytics Measurement Protocol (debug)
+        resolver 8.8.8.8 8.8.4.4 valid=300s;
+        resolver_timeout 5s;
+
+        set $ga_mp_backend "https://www.google-analytics.com";
+        set $ga_query "measurement_id=${GOOGLE_ANALYTICS_MEASUREMENT_ID}&api_secret=${GOOGLE_ANALYTICS_API_SECRET}";
+
+        if ($args != "") {
+            set $ga_query "${ga_query}&${args}";
+        }
+
+        proxy_pass $ga_mp_backend/debug/mp/collect?$ga_query;
+        proxy_ssl_server_name on;
+
+        proxy_set_header Host www.google-analytics.com;
+        proxy_set_header Content-Type application/json;
+
+        access_log /var/log/nginx/ga-mp-access.log json_api;
+        error_log /var/log/nginx/ga-mp-error.log warn;
+    }
+
+    # ================================
+    # Google Analytics - Data API
+    # ================================
+    location /api/ga/data/ {
+        # Proxy vers Google Analytics Data API
+        resolver 8.8.8.8 8.8.4.4 valid=300s;
+        resolver_timeout 5s;
+
+        # Définir la variable backend
+        set $ga_data_backend "https://analyticsdata.googleapis.com";
+
+        # Transmission du chemin
+        rewrite ^/api/ga/data/(.*)$ /$1 break;
+        rewrite ^/api/ga/data$ / break;
+
+        proxy_pass $ga_data_backend;
+        proxy_ssl_server_name on;
+
+        # Headers spécifiques incluant l'authentification
+        proxy_set_header Host analyticsdata.googleapis.com;
+        proxy_set_header Authorization "Bearer ${GOOGLE_ANALYTICS_TOKEN}";
+
+        # Logs
+        access_log /var/log/nginx/ga-data-access.log json_api;
+        error_log /var/log/nginx/ga-data-error.log warn;
+    }
+
+    # ================================
+    # Google Analytics - Admin API
+    # ================================
+    location /api/ga/admin/ {
+        # Proxy vers Google Analytics Admin API
+        resolver 8.8.8.8 8.8.4.4 valid=300s;
+        resolver_timeout 5s;
+
+        # Définir la variable backend
+        set $ga_admin_backend "https://analyticsadmin.googleapis.com";
+
+        # Transmission du chemin
+        rewrite ^/api/ga/admin/(.*)$ /$1 break;
+        rewrite ^/api/ga/admin$ / break;
+
+        proxy_pass $ga_admin_backend;
+        proxy_ssl_server_name on;
+
+        # Headers spécifiques incluant l'authentification
+        proxy_set_header Host analyticsadmin.googleapis.com;
+        proxy_set_header Authorization "Bearer ${GOOGLE_ANALYTICS_TOKEN}";
+
+        # Logs
+        access_log /var/log/nginx/ga-admin-access.log json_api;
+        error_log /var/log/nginx/ga-admin-error.log warn;
+    }
+
+    # ================================
+    # Service Ollama (accès local via host)
+    # ================================
+    location /api/ollama/ {
+        # Proxy vers Ollama sur le host
+        rewrite ^/api/ollama/(.*) /$1 break;
+        rewrite ^/api/ollama$ / break;
+
+        proxy_pass http://host.docker.internal:11434;
+
+        # Headers spécifiques
+        proxy_set_header Host $host;
+
+        # Timeouts augmentés pour les requêtes LLM longues
+        proxy_connect_timeout 300s;
+        proxy_send_timeout 300s;
+        proxy_read_timeout 300s;
+
+        # Support du streaming
+        proxy_buffering off;
+        proxy_cache off;
+        chunked_transfer_encoding on;
+
+        # Logs
+        access_log /var/log/nginx/ollama-access.log json_api;
+        error_log /var/log/nginx/ollama-error.log warn;
+    }
+
+    # ================================
+    # Service N8N (accès local)
+    # ================================
+    location /api/n8n/ {
+        rewrite ^/api/n8n/(.*) /$1 break;
+        proxy_pass http://n8n:5678;
+
+        # Logs
+        access_log /var/log/nginx/n8n-access.log json_api;
+        error_log /var/log/nginx/n8n-error.log warn;
+    }
+
+    # ================================
+    # Service Qdrant (accès local)
+    # ================================
+    location /api/qdrant/ {
+        rewrite ^/api/qdrant/(.*) /$1 break;
+        proxy_pass http://qdrant:6333;
+
+        # Logs
+        access_log /var/log/nginx/qdrant-access.log json_api;
+        error_log /var/log/nginx/qdrant-error.log warn;
+    }
+
+    # ================================
+    # Health check
+    # ================================
+    location /health {
+        access_log off;
+        return 200 "OK\n";
+        add_header Content-Type text/plain;
+    }
+
+    # ================================
+    # Status page (optionnel)
+    # ================================
+    location /nginx-status {
+        stub_status on;
+        access_log off;
+        allow 127.0.0.1;
+        allow 172.16.0.0/12;  # Docker networks
+        deny all;
+    }
+}

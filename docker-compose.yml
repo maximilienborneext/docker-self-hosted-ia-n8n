@@ -1,14 +1,16 @@
 volumes:
   n8n_storage:
   postgres_storage:
-  ollama_storage:
   qdrant_storage:
+  prometheus_data:
+  grafana_data:
+  nginx_logs:
 
 networks:
   demo:
 
 x-n8n: &service-n8n
-  image: n8nio/n8n:latest
+  image: n8nio/n8n:beta
   networks: ['demo']
   environment:
     - DB_TYPE=postgresdb
@@ -19,33 +21,19 @@ x-n8n: &service-n8n
     - N8N_PERSONALIZATION_ENABLED=false
     - N8N_ENCRYPTION_KEY
     - N8N_USER_MANAGEMENT_JWT_SECRET
-    - OLLAMA_HOST=${OLLAMA_HOST:-ollama:11434}
+    - N8N_BLOCK_ENV_ACCESS_IN_NODE=false
+    - N8N_ENV_WHITELIST=BRIDGE_API_CLIENT_ID,BRIDGE_API_CLIENT_SECRET
+    - OLLAMA_HOST=http://host.docker.internal:11434
+    - BRIDGE_API_CLIENT_ID=sandbox_id_08271d6127534385918650e90112774d
+    - BRIDGE_API_CLIENT_SECRET=sandbox_secret_kPUJ07NSFUHgRnkK7o1VDyQgGZBTgGKGAAdcolPeXC7eymp8kclQBgb0n1JmJydt
+    - N8N_METRICS=true
+    - N8N_LOG_LEVEL=debug
+    - N8N_LOG_OUTPUT=console
+    - N8N_LOG_FORMAT=json
+    - N8N_TASK_RUNNERS_ENABLED=false
   env_file:
     - path: .env
       required: true
-
-x-ollama: &service-ollama
-  image: ollama/ollama:latest
-  container_name: ollama
-  networks: ['demo']
-  restart: unless-stopped
-  ports:
-    - 11434:11434
-  volumes:
-    - ollama_storage:/root/.ollama
-
-x-init-ollama: &init-ollama
-  image: ollama/ollama:latest
-  networks: ['demo']
-  container_name: ollama-pull-llama
-  volumes:
-    - ollama_storage:/root/.ollama
-  entrypoint: /bin/sh
-  environment:
-    - OLLAMA_HOST=ollama:11434
-  command:
-    - "-c"
-    - "sleep 3; ollama pull llama3.2"
 
 services:
   postgres:
@@ -78,6 +66,9 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    restart: "no"
+    logging:
+      driver: "json-file"
 
   n8n:
     <<: *service-n8n
@@ -95,6 +86,11 @@ services:
         condition: service_healthy
       n8n-import:
         condition: service_completed_successfully
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    logging:
+      driver: "json-file"
+
 
   qdrant:
     image: qdrant/qdrant
@@ -106,45 +102,99 @@ services:
       - 6333:6333
     volumes:
       - qdrant_storage:/qdrant/storage
+    logging:
+      driver: "json-file"
 
-  ollama-cpu:
-    profiles: ["cpu"]
-    <<: *service-ollama
-
-  ollama-gpu:
-    profiles: ["gpu-nvidia"]
-    <<: *service-ollama
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
-
-  ollama-gpu-amd:
-    profiles: ["gpu-amd"]
-    <<: *service-ollama
-    image: ollama/ollama:rocm
-    devices:
-      - "/dev/kfd"
-      - "/dev/dri"
-
-  ollama-pull-llama-cpu:
-    profiles: ["cpu"]
-    <<: *init-ollama
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    hostname: prometheus
+    networks: ['demo']
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    restart: unless-stopped
     depends_on:
-      - ollama-cpu
+      - n8n
+    logging:
+      driver: "json-file"
 
-  ollama-pull-llama-gpu:
-    profiles: ["gpu-nvidia"]
-    <<: *init-ollama
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    hostname: grafana
+    networks: ['demo']
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+    restart: unless-stopped
     depends_on:
-      - ollama-gpu
+      - prometheus
+      - loki
+    logging:
+      driver: "json-file"
 
-  ollama-pull-llama-gpu-amd:
-    profiles: [gpu-amd]
-    <<: *init-ollama
-    image: ollama/ollama:rocm
+  loki:
+    image: grafana/loki:latest
+    container_name: loki
+    hostname: loki
+    networks: ['demo']
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./loki/loki-config.yml:/etc/loki/local-config.yml:ro
+    command: -config.file=/etc/loki/local-config.yml
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+
+  promtail:
+    image: grafana/promtail:latest
+    container_name: promtail
+    hostname: promtail
+    networks: ['demo']
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./loki/promtail-config.yml:/etc/promtail/config.yml:ro
+      - nginx_logs:/var/log/nginx:ro
+    command: -config.file=/etc/promtail/config.yml
+    restart: unless-stopped
     depends_on:
-     - ollama-gpu-amd
+      - nginx
+    logging:
+      driver: "json-file"
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    hostname: nginx
+    networks: ['demo']
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/api.conf:/etc/nginx/conf.d/api.conf:ro
+      - ./nginx/proxy.conf.template:/etc/nginx/conf.d/proxy.conf.template:ro
+      - ./nginx/docker-entrypoint.sh:/docker-entrypoint.sh:ro
+      - nginx_logs:/var/log/nginx
+    environment:
+      - RAG_UPSTREAM_URL=${RAG_UPSTREAM_URL}
+      - BRAINTRUST_API_KEY=${BRAINTRUST_API_KEY}
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_API_KEY=${SUPABASE_API_KEY}
+      - GOOGLE_ANALYTICS_MEASUREMENT_ID=${GOOGLE_ANALYTICS_MEASUREMENT_ID}
+      - GOOGLE_ANALYTICS_API_SECRET=${GOOGLE_ANALYTICS_API_SECRET}
+      - GOOGLE_ANALYTICS_TOKEN=${GOOGLE_ANALYTICS_TOKEN}
+    entrypoint: ["/docker-entrypoint.sh"]
+    depends_on:
+      - n8n
+      - qdrant
+    logging:
+      driver: "json-file"
