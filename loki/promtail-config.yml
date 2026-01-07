@@ -6,7 +6,8 @@ positions:
   filename: /tmp/positions.yaml
 
 clients:
-  - url: http://loki:3100/loki/api/v1/push
+  # Push des logs via le proxy NGINX pour centralisation
+  - url: http://nginx:80/api/loki/loki/api/v1/push
 
 scrape_configs:
   # Logs des conteneurs Docker

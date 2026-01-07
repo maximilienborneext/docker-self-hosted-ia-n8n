@@ -73,6 +73,7 @@ Le proxy NGINX centralise tous les appels vers les services externes et locaux, 
 | Ollama | `/api/ollama/` | `host.docker.internal:11434` |
 | N8N | `/api/n8n/` | `n8n:5678` |
 | Qdrant | `/api/qdrant/` | `qdrant:6333` |
+| Loki | `/api/loki/` | `loki:3100` |
 
 ### Utilitaires
 
