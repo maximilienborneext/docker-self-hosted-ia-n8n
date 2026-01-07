@@ -1,0 +1,375 @@
+{
+  "updatedAt": "2025-12-17T08:37:41.260Z",
+  "createdAt": "2025-12-16T21:13:01.853Z",
+  "id": "oYnCcvk1qrRrwxBl",
+  "name": "ParentWorkflow",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -560,
+        -16
+      ],
+      "id": "196ad11a-2548-49be-8aa1-1975cc80d09a",
+      "name": "When chat message received",
+      "webhookId": "f9f2de63-1a91-4391-807b-01b92530dfa8",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{$json.text}}  pour l'utilisateur suivant {{ $('Edit Fields').item.json.from_id }} verifier si il existe en base de donnee ",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -192,
+        -16
+      ],
+      "id": "42d7c8dc-8380-4d06-8c3d-e471ad7d1877",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "llama3.1:8b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        -336,
+        368
+      ],
+      "id": "bc46d68f-eded-4174-b773-38284dc10c98",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "6l4JjfOyCB2Uk6dI",
+          "name": "Ollama account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "yQNhkKHdRM71IFvO",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/yQNhkKHdRM71IFvO",
+          "cachedResultName": "ChildAgent"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        48,
+        432
+      ],
+      "id": "a8d089fd-72a3-4114-b6d7-2b08a30d4123",
+      "name": "BankAgent"
+    },
+    {
+      "parameters": {
+        "content": "## Agent Bancaire\nPermet la récupération des informations bancaires depuis Bridge API\n\n\n[Documentation](https://docs.n8n.io/workflows/components/sticky-notes/)",
+        "height": 272,
+        "width": 320,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -128,
+        288
+      ],
+      "typeVersion": 1,
+      "id": "7415fd4b-5776-4ee7-ba1f-a04113a543f0",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Agent Bancaire\nPermet la récupération des informations bancaires depuis Bridge API\n\n\n[Documentation ](https://docs.n8n.io/workflows/components/sticky-notes/)",
+        "height": 272,
+        "width": 320,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        224,
+        288
+      ],
+      "typeVersion": 1,
+      "id": "dc200383-bee1-43e8-bb1f-38540c7ac956",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1456,
+        256
+      ],
+      "id": "ce8a565d-dee4-43d0-b75a-ed428d3bbe3e",
+      "name": "Telegram Trigger",
+      "webhookId": "e0a0dcc5-b1f0-4cbc-a583-e15805dbc6c0",
+      "credentials": {
+        "telegramApi": {
+          "id": "sGClvlRJ30rg1jXf",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://api.telegram.org/bot8529802168:AAEyaUKDgaDxIxcfCNSAfv4YW2IY9KdO_DE/getFile",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "file_id",
+              "value": "={{ $('Telegram Trigger').item.json.message.voice.file_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1024,
+        256
+      ],
+      "id": "90345e7a-e7aa-45fa-b98b-1c5730be8e70",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.telegram.org/file/bot8529802168:AAEyaUKDgaDxIxcfCNSAfv4YW2IY9KdO_DE/{{$json.result.file_path}}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file",
+              "outputPropertyName": "audio"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -848,
+        256
+      ],
+      "id": "b5835238-1004-45d8-a00e-02bac81f71e9",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "binaryPropertyName": "=audio",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        -656,
+        256
+      ],
+      "id": "c76bb480-c68d-4e6a-96f7-98fbb10de829",
+      "name": "Transcribe a recording",
+      "credentials": {
+        "openAiApi": {
+          "id": "q0SovBRAM8uAguqi",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"from_id\": \"{{ $json.message.from.id }}\",\n  \"chat_id\": \"{{$json.message.chat.id}}\"\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1248,
+        256
+      ],
+      "id": "2efdb476-ddee-4878-9bce-37b172c73f91",
+      "name": "Edit Fields",
+      "alwaysOutputData": true
+    }
+  ],
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "BankAgent": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Transcribe a recording",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe a recording": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "443e8479-dfeb-4144-82cd-9b0934658a4b",
+  "activeVersionId": null,
+  "versionCounter": 22,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-12-16T21:13:01.853Z",
+      "createdAt": "2025-12-16T21:13:01.853Z",
+      "role": "workflow:owner",
+      "workflowId": "oYnCcvk1qrRrwxBl",
+      "projectId": "IAHu1pQG7dfjTd27",
+      "project": {
+        "updatedAt": "2025-12-11T22:33:03.220Z",
+        "createdAt": "2025-12-11T22:31:39.471Z",
+        "id": "IAHu1pQG7dfjTd27",
+        "name": "Maximilien Borne <maximilien.borne@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "570e55b9-573e-4a41-afcc-59cd77b6ae62",
+        "projectRelations": [
+          {
+            "updatedAt": "2025-12-11T22:31:39.471Z",
+            "createdAt": "2025-12-11T22:31:39.471Z",
+            "userId": "570e55b9-573e-4a41-afcc-59cd77b6ae62",
+            "projectId": "IAHu1pQG7dfjTd27",
+            "user": {
+              "updatedAt": "2026-01-07T08:52:56.782Z",
+              "createdAt": "2025-12-11T22:31:39.257Z",
+              "id": "570e55b9-573e-4a41-afcc-59cd77b6ae62",
+              "email": "maximilien.borne@gmail.com",
+              "firstName": "Maximilien",
+              "lastName": "Borne",
+              "personalizationAnswers": null,
+              "settings": {
+                "userActivated": true,
+                "easyAIWorkflowOnboarded": true,
+                "firstSuccessfulWorkflowId": "NSySTjcSvLewMF1T",
+                "userActivatedAt": 1765806789336
+              },
+              "disabled": false,
+              "mfaEnabled": false,
+              "lastActiveAt": "2026-01-07",
+              "isPending": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": null
+}
