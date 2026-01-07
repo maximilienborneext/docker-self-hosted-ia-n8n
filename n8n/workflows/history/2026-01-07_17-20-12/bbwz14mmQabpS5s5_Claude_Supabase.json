@@ -1,0 +1,629 @@
+{
+  "updatedAt": "2025-12-16T20:02:57.046Z",
+  "createdAt": "2025-12-15T15:48:16.805Z",
+  "id": "bbwz14mmQabpS5s5",
+  "name": "Claude + Supabase",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -624,
+        0
+      ],
+      "id": "a857acf6-9e77-4234-bde0-6aa32d7215e1",
+      "name": "When chat message received",
+      "webhookId": "1f908125-298b-4833-8282-255e56380c34"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        64,
+        -16
+      ],
+      "id": "00e53e81-109f-41cf-93d7-3ff99be37260",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "claude-sonnet-4-5-20250929",
+          "cachedResultName": "Claude Sonnet 4.5"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [
+        -144,
+        224
+      ],
+      "id": "554ce129-ce5a-4382-8138-544e685c77d3",
+      "name": "Anthropic Chat Model",
+      "credentials": {
+        "anthropicApi": {
+          "id": "vXHVAMv7KNW1GdhY",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "Product"
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        384,
+        192
+      ],
+      "id": "3543cea9-cd4a-41d1-a982-ce270382e45c",
+      "name": "Create a row in Supabase",
+      "credentials": {
+        "supabaseApi": {
+          "id": "h7LAli2C03QNpkjp",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "Product",
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        224,
+        192
+      ],
+      "id": "34728586-5c2b-4bce-9db7-3ebbc5bcbce6",
+      "name": "Get many rows in Supabase",
+      "credentials": {
+        "supabaseApi": {
+          "id": "h7LAli2C03QNpkjp",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "llama3.1:8b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        48,
+        240
+      ],
+      "id": "cc27fd08-deaa-4927-bcd8-3fc935f814dc",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "6l4JjfOyCB2Uk6dI",
+          "name": "Ollama account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -208,
+        528
+      ],
+      "id": "609a17f9-cce5-4832-a137-df1bc521b1db",
+      "name": "Telegram Trigger",
+      "webhookId": "e0a0dcc5-b1f0-4cbc-a583-e15805dbc6c0",
+      "credentials": {
+        "telegramApi": {
+          "id": "sGClvlRJ30rg1jXf",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://api.telegram.org/bot8529802168:AAEyaUKDgaDxIxcfCNSAfv4YW2IY9KdO_DE/getFile",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "file_id",
+              "value": "={{ $('Telegram Trigger').item.json.message.voice.file_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        224,
+        464
+      ],
+      "id": "3e2c1b27-5886-4ae9-a61e-c12166db86b9",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.telegram.org/file/bot8529802168:AAEyaUKDgaDxIxcfCNSAfv4YW2IY9KdO_DE/{{$json.result.file_path}}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file",
+              "outputPropertyName": "audio"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        432,
+        464
+      ],
+      "id": "a7bc26a5-9bae-4bcb-9f48-2c71be9d1332",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "binaryPropertyName": "=audio",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        592,
+        464
+      ],
+      "id": "3991b150-29bf-4b2f-b9ad-313292e63b90",
+      "name": "Transcribe a recording",
+      "credentials": {
+        "openAiApi": {
+          "id": "q0SovBRAM8uAguqi",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{$json.text}}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        816,
+        464
+      ],
+      "id": "4e269238-bd2e-4416-9bd7-779f0aa9c88d",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "Product",
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        608,
+        1056
+      ],
+      "id": "13eee112-ba75-44c6-86dd-8747f7eef7a3",
+      "name": "Get many rows in Supabase1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "h7LAli2C03QNpkjp",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "llama3.1:8b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        416,
+        1056
+      ],
+      "id": "d29dc7ff-0a01-4d9e-b15c-0c00ae257b53",
+      "name": "Ollama Chat Model1",
+      "credentials": {
+        "ollamaApi": {
+          "id": "6l4JjfOyCB2Uk6dI",
+          "name": "Ollama account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1264,
+        528
+      ],
+      "id": "a0b7b2cd-c40a-432d-a84b-11fab0bbc3e1",
+      "name": "Send a text message",
+      "webhookId": "a38e02f1-ba9e-4c15-9ea4-85ee0bd115b8",
+      "credentials": {
+        "telegramApi": {
+          "id": "sGClvlRJ30rg1jXf",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.bridgeapi.io/v3/aggregation/users",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n  \"Bridge-Version\": \"2025-01-15\",\n  \"Client-Id\": \"sandbox_id_08271d6127534385918650e90112774d\",\n  \"Client-Secret\": \"sandbox_secret_kPUJ07NSFUHgRnkK7o1VDyQgGZBTgGKGAAdcolPeXC7eymp8kclQBgb0n1JmJydt\",\n  \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{ \"external_user_id\": \"ton_user_id_interne_4\" }",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -960,
+        352
+      ],
+      "id": "054a37fe-6c78-4162-b951-8de30279ed0a",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.bridgeapi.io/v3/aggregation/authorization/token",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n  \"Bridge-Version\": \"2025-01-15\",\n  \"Client-Id\": \"sandbox_id_08271d6127534385918650e90112774d\",\n  \"Client-Secret\":\"sandbox_secret_kPUJ07NSFUHgRnkK7o1VDyQgGZBTgGKGAAdcolPeXC7eymp8kclQBgb0n1JmJydt\",\n  \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"user_uuid\": \"{{ $json.uuid }}\" }",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -752,
+        352
+      ],
+      "id": "ce8b61ac-dc1e-47c3-a910-3c2603a57e34",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { v: process.env.BRIDGE_API_CLIENT_ID ?? null } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -720,
+        752
+      ],
+      "id": "d1664753-5d9f-4f09-b2f7-82863bea7b1c",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.bridgeapi.io/v3/aggregation/connect-sessions",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={\n  \"Authorization\": \"Bearer {{ $json.access_token }}\",\n  \"Bridge-Version\": \"2025-01-15\",\n  \"Client-Id\": \"sandbox_id_08271d6127534385918650e90112774d\",\n  \"Client-Secret\": \"sandbox_secret_kPUJ07NSFUHgRnkK7o1VDyQgGZBTgGKGAAdcolPeXC7eymp8kclQBgb0n1JmJydt\",\n  \"Content-Type\": \"application/json\"\n} ",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"user_email\": \"user@test.com\",\n  \"callback_url\": \"http://localhost:5678//webhook/bridge-callback\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -544,
+        352
+      ],
+      "id": "4c6e30b8-1cd3-445e-a195-d084ba585c0a",
+      "name": "HTTP Request4"
+    },
+    {
+      "parameters": {
+        "description": "Information Bancaire",
+        "source": "parameter",
+        "workflowJson": "={\n  \"telegram_user_id\": \"1\",\n  \"telegram_chat_id\": \"2\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        800,
+        1104
+      ],
+      "id": "2926c591-9b79-428c-bc8e-05b9484b9451",
+      "name": "Call 'BanqueFlow'"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"from_id\": \"{{ $json.message.from.id }}\",\n  \"chat_id\": \"{{$json.message.chat.id}}\"\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -16,
+        528
+      ],
+      "id": "81628d41-2821-40d9-ac65-adf2bfdc74f8",
+      "name": "Edit Fields",
+      "alwaysOutputData": true
+    }
+  ],
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Chat Model": {
+      "ai_languageModel": [
+        []
+      ]
+    },
+    "Create a row in Supabase": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many rows in Supabase": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Transcribe a recording",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe a recording": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many rows in Supabase1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request3": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'BanqueFlow'": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "3a9334af-2e05-4ed7-9519-45772cd25756",
+  "activeVersionId": null,
+  "versionCounter": 35,
+  "triggerCount": 2,
+  "shared": [
+    {
+      "updatedAt": "2025-12-15T15:48:16.805Z",
+      "createdAt": "2025-12-15T15:48:16.805Z",
+      "role": "workflow:owner",
+      "workflowId": "bbwz14mmQabpS5s5",
+      "projectId": "IAHu1pQG7dfjTd27",
+      "project": {
+        "updatedAt": "2025-12-11T22:33:03.220Z",
+        "createdAt": "2025-12-11T22:31:39.471Z",
+        "id": "IAHu1pQG7dfjTd27",
+        "name": "Maximilien Borne <maximilien.borne@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "570e55b9-573e-4a41-afcc-59cd77b6ae62",
+        "projectRelations": [
+          {
+            "updatedAt": "2025-12-11T22:31:39.471Z",
+            "createdAt": "2025-12-11T22:31:39.471Z",
+            "userId": "570e55b9-573e-4a41-afcc-59cd77b6ae62",
+            "projectId": "IAHu1pQG7dfjTd27",
+            "user": {
+              "updatedAt": "2026-01-07T08:52:56.782Z",
+              "createdAt": "2025-12-11T22:31:39.257Z",
+              "id": "570e55b9-573e-4a41-afcc-59cd77b6ae62",
+              "email": "maximilien.borne@gmail.com",
+              "firstName": "Maximilien",
+              "lastName": "Borne",
+              "personalizationAnswers": null,
+              "settings": {
+                "userActivated": true,
+                "easyAIWorkflowOnboarded": true,
+                "firstSuccessfulWorkflowId": "NSySTjcSvLewMF1T",
+                "userActivatedAt": 1765806789336
+              },
+              "disabled": false,
+              "mfaEnabled": false,
+              "lastActiveAt": "2026-01-07",
+              "isPending": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": null
+}

@@ -1,0 +1,199 @@
+{
+  "updatedAt": "2025-12-17T12:29:44.065Z",
+  "createdAt": "2025-12-17T12:29:44.065Z",
+  "id": "OpJjYWvzi16RCAiy",
+  "name": "My Sub-workflow",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.3,
+      "position": [
+        1392,
+        768
+      ],
+      "id": "cb6ab512-bade-4c8f-9310-4401bac6b3c9",
+      "name": "HTTP Request",
+      "disabled": false,
+      "parameters": {
+        "preBuiltAgentsCalloutHttpRequest": "",
+        "toolDescription": "Makes an HTTP request and returns the response data",
+        "curlImport": "",
+        "method": "GET",
+        "url": "",
+        "authentication": "none",
+        "provideSslCertificates": false,
+        "sendQuery": false,
+        "sendHeaders": false,
+        "sendBody": false,
+        "options": {},
+        "optimizeResponse": false,
+        "infoMessage": ""
+      },
+      "issues": {
+        "parameters": {
+          "url": [
+            "Parameter \"URL\" is required."
+          ]
+        }
+      }
+    },
+    {
+      "id": "a68e8275-b5e0-47c3-95a4-25051ceab47d",
+      "typeVersion": 1.1,
+      "name": "Start",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        1184,
+        768
+      ],
+      "parameters": {
+        "inputSource": "passthrough"
+      }
+    }
+  ],
+  "connections": {
+    "HTTP Request": {
+      "ai_tool": [
+        [
+          {
+            "node": "Banque Operator",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": null,
+  "versionId": "a5f2c018-f2b8-4c31-b353-a2221085b0a0",
+  "activeVersionId": "a5f2c018-f2b8-4c31-b353-a2221085b0a0",
+  "versionCounter": 31,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-12-17T12:29:44.065Z",
+      "createdAt": "2025-12-17T12:29:44.065Z",
+      "role": "workflow:owner",
+      "workflowId": "OpJjYWvzi16RCAiy",
+      "projectId": "IAHu1pQG7dfjTd27",
+      "project": {
+        "updatedAt": "2025-12-11T22:33:03.220Z",
+        "createdAt": "2025-12-11T22:31:39.471Z",
+        "id": "IAHu1pQG7dfjTd27",
+        "name": "Maximilien Borne <maximilien.borne@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "570e55b9-573e-4a41-afcc-59cd77b6ae62",
+        "projectRelations": [
+          {
+            "updatedAt": "2025-12-11T22:31:39.471Z",
+            "createdAt": "2025-12-11T22:31:39.471Z",
+            "userId": "570e55b9-573e-4a41-afcc-59cd77b6ae62",
+            "projectId": "IAHu1pQG7dfjTd27",
+            "user": {
+              "updatedAt": "2026-01-07T08:52:56.782Z",
+              "createdAt": "2025-12-11T22:31:39.257Z",
+              "id": "570e55b9-573e-4a41-afcc-59cd77b6ae62",
+              "email": "maximilien.borne@gmail.com",
+              "firstName": "Maximilien",
+              "lastName": "Borne",
+              "personalizationAnswers": null,
+              "settings": {
+                "userActivated": true,
+                "easyAIWorkflowOnboarded": true,
+                "firstSuccessfulWorkflowId": "NSySTjcSvLewMF1T",
+                "userActivatedAt": 1765806789336
+              },
+              "disabled": false,
+              "mfaEnabled": false,
+              "lastActiveAt": "2026-01-07",
+              "isPending": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": {
+    "updatedAt": "2025-12-17T12:29:44.065Z",
+    "createdAt": "2025-12-17T12:29:44.065Z",
+    "versionId": "a5f2c018-f2b8-4c31-b353-a2221085b0a0",
+    "workflowId": "OpJjYWvzi16RCAiy",
+    "nodes": [
+      {
+        "type": "n8n-nodes-base.httpRequestTool",
+        "typeVersion": 4.3,
+        "position": [
+          1392,
+          768
+        ],
+        "id": "cb6ab512-bade-4c8f-9310-4401bac6b3c9",
+        "name": "HTTP Request",
+        "disabled": false,
+        "parameters": {
+          "preBuiltAgentsCalloutHttpRequest": "",
+          "toolDescription": "Makes an HTTP request and returns the response data",
+          "curlImport": "",
+          "method": "GET",
+          "url": "",
+          "authentication": "none",
+          "provideSslCertificates": false,
+          "sendQuery": false,
+          "sendHeaders": false,
+          "sendBody": false,
+          "options": {},
+          "optimizeResponse": false,
+          "infoMessage": ""
+        },
+        "issues": {
+          "parameters": {
+            "url": [
+              "Parameter \"URL\" is required."
+            ]
+          }
+        }
+      },
+      {
+        "id": "a68e8275-b5e0-47c3-95a4-25051ceab47d",
+        "typeVersion": 1.1,
+        "name": "Start",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "position": [
+          1184,
+          768
+        ],
+        "parameters": {
+          "inputSource": "passthrough"
+        }
+      }
+    ],
+    "connections": {
+      "HTTP Request": {
+        "ai_tool": [
+          [
+            {
+              "node": "Banque Operator",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Maximilien Borne",
+    "name": null,
+    "description": null,
+    "autosaved": false,
+    "workflowPublishHistory": []
+  }
+}

@@ -1,0 +1,636 @@
+{
+  "updatedAt": "2025-12-22T15:25:55.401Z",
+  "createdAt": "2025-12-18T13:14:21.063Z",
+  "id": "lLSKvqmpw0A8yYdR",
+  "name": "AccountAgent",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "id_telegram"
+            },
+            {
+              "name": "external_name"
+            },
+            {
+              "name": "input"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        96,
+        320
+      ],
+      "id": "f6dc078e-013c-4ab4-9f76-6714dc343abf",
+      "name": "When Executed by Another Workflow",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"external_name\": \"{{ $json.external_name }}\",\n  \"id_telegram\": \"{{ $json.id_telegram }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        384,
+        320
+      ],
+      "id": "0a524921-8cfe-4268-87fc-d2123a9130cc",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.bridgeapi.io/v3/aggregation/users",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n  \"Bridge-Version\": \"2025-01-15\",\n  \"Client-Id\": \"sandbox_id_08271d6127534385918650e90112774d\",\n  \"Client-Secret\": \"sandbox_secret_kPUJ07NSFUHgRnkK7o1VDyQgGZBTgGKGAAdcolPeXC7eymp8kclQBgb0n1JmJydt\",\n  \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"external_user_id\": \"{{ $json.id_telegram }}\" }",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        736,
+        320
+      ],
+      "id": "69e380d6-1919-4207-a136-241c3c39d94c",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.bridgeapi.io/v3/aggregation/authorization/token",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n  \"Bridge-Version\": \"2025-01-15\",\n  \"Client-Id\": \"sandbox_id_08271d6127534385918650e90112774d\",\n  \"Client-Secret\":\"sandbox_secret_kPUJ07NSFUHgRnkK7o1VDyQgGZBTgGKGAAdcolPeXC7eymp8kclQBgb0n1JmJydt\",\n  \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"user_uuid\": \"{{ $json.body.uuid }}\" }",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1312,
+        320
+      ],
+      "id": "35401635-449d-48e4-973f-e866e798067d",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.bridgeapi.io/v3/aggregation/connect-sessions",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={\n  \"Authorization\": \"Bearer {{ $json.access_token }}\",\n  \"Bridge-Version\": \"2025-01-15\",\n  \"Client-Id\": \"sandbox_id_08271d6127534385918650e90112774d\",\n  \"Client-Secret\": \"sandbox_secret_kPUJ07NSFUHgRnkK7o1VDyQgGZBTgGKGAAdcolPeXC7eymp8kclQBgb0n1JmJydt\",\n  \"Content-Type\": \"application/json\"\n} ",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"user_email\": \"user@test.com\",\n  \"callback_url\": \"http://nonconsorting-cathy-royally.ngrok-free.dev/webhook-test/bridge-callback\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1824,
+        320
+      ],
+      "id": "ae501a38-a1d3-4b4c-9d2a-5cf6d988424b",
+      "name": "HTTP Request4"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"user_email\": \"user@test.com\",\n  \"callback_url\": \"\",\n  \"uuid\": \"{{ $('HTTP Request3').item.json.user.uuid }}\"\n  \n}",
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2752,
+        320
+      ],
+      "id": "cf06c98a-ab3e-4de4-9d71-3353263f072d",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "Users",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id_telegram",
+              "condition": "eq",
+              "keyValue": "={{ $('Edit Fields').item.json.id_telegram }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "uuid",
+              "fieldValue": "={{ $('HTTP Request3').item.json.user.uuid }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2336,
+        320
+      ],
+      "id": "cb8b57ef-e0f7-426b-b88a-ffaf9b527d7a",
+      "name": "Update a row1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "h7LAli2C03QNpkjp",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"callback_url\": \"{{ $json.url }}\"\n} ",
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2096,
+        320
+      ],
+      "id": "bf1781b3-9490-47aa-81d7-5661f379a0a0",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"uuid\": \"{{ $json.uuid }}\"\n}",
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        976,
+        320
+      ],
+      "id": "4591da05-99a0-40bf-b041-a5e6b203582e",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"access_token\": \"{{ $json.access_token }}\",\n  \"expires_at\": \"{{ $json.expires_at }}\",\n  \"user\" : {\n    \"uuid\": \"{{ $json.user.uuid }}\"\n    }\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1520,
+        320
+      ],
+      "id": "1e62baa9-2ef6-4496-9942-75e17abe9552",
+      "name": "Edit Fields4"
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request3": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request4": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a row1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Update a row1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields4": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "b6215b8f-83d8-461d-a08d-a9df135ab439",
+  "activeVersionId": "86561683-3e7c-42e2-b791-0f0e4c484ce1",
+  "versionCounter": 131,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-12-18T13:14:21.063Z",
+      "createdAt": "2025-12-18T13:14:21.063Z",
+      "role": "workflow:owner",
+      "workflowId": "lLSKvqmpw0A8yYdR",
+      "projectId": "IAHu1pQG7dfjTd27",
+      "project": {
+        "updatedAt": "2025-12-11T22:33:03.220Z",
+        "createdAt": "2025-12-11T22:31:39.471Z",
+        "id": "IAHu1pQG7dfjTd27",
+        "name": "Maximilien Borne <maximilien.borne@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "570e55b9-573e-4a41-afcc-59cd77b6ae62",
+        "projectRelations": [
+          {
+            "updatedAt": "2025-12-11T22:31:39.471Z",
+            "createdAt": "2025-12-11T22:31:39.471Z",
+            "userId": "570e55b9-573e-4a41-afcc-59cd77b6ae62",
+            "projectId": "IAHu1pQG7dfjTd27",
+            "user": {
+              "updatedAt": "2026-01-07T08:52:56.782Z",
+              "createdAt": "2025-12-11T22:31:39.257Z",
+              "id": "570e55b9-573e-4a41-afcc-59cd77b6ae62",
+              "email": "maximilien.borne@gmail.com",
+              "firstName": "Maximilien",
+              "lastName": "Borne",
+              "personalizationAnswers": null,
+              "settings": {
+                "userActivated": true,
+                "easyAIWorkflowOnboarded": true,
+                "firstSuccessfulWorkflowId": "NSySTjcSvLewMF1T",
+                "userActivatedAt": 1765806789336
+              },
+              "disabled": false,
+              "mfaEnabled": false,
+              "lastActiveAt": "2026-01-07",
+              "isPending": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": {
+    "updatedAt": "2025-12-22T14:25:03.118Z",
+    "createdAt": "2025-12-22T14:24:51.014Z",
+    "versionId": "86561683-3e7c-42e2-b791-0f0e4c484ce1",
+    "workflowId": "lLSKvqmpw0A8yYdR",
+    "nodes": [
+      {
+        "parameters": {
+          "workflowInputs": {
+            "values": [
+              {
+                "name": "id_telegram"
+              },
+              {
+                "name": "external_name"
+              },
+              {
+                "name": "input"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          96,
+          320
+        ],
+        "id": "f6dc078e-013c-4ab4-9f76-6714dc343abf",
+        "name": "When Executed by Another Workflow",
+        "alwaysOutputData": true
+      },
+      {
+        "parameters": {
+          "mode": "raw",
+          "jsonOutput": "={\n  \"external_name\": \"{{ $json.external_name }}\",\n  \"id_telegram\": \"{{ $json.id_telegram }}\"\n}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          384,
+          320
+        ],
+        "id": "0a524921-8cfe-4268-87fc-d2123a9130cc",
+        "name": "Edit Fields"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.bridgeapi.io/v3/aggregation/users",
+          "sendHeaders": true,
+          "specifyHeaders": "json",
+          "jsonHeaders": "{\n  \"Bridge-Version\": \"2025-01-15\",\n  \"Client-Id\": \"sandbox_id_08271d6127534385918650e90112774d\",\n  \"Client-Secret\": \"sandbox_secret_kPUJ07NSFUHgRnkK7o1VDyQgGZBTgGKGAAdcolPeXC7eymp8kclQBgb0n1JmJydt\",\n  \"Content-Type\": \"application/json\"\n}",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={ \"external_user_id\": \"{{ $json.id_telegram }}\" }",
+          "options": {
+            "response": {
+              "response": {
+                "fullResponse": true,
+                "responseFormat": "json"
+              }
+            }
+          }
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.3,
+        "position": [
+          736,
+          320
+        ],
+        "id": "69e380d6-1919-4207-a136-241c3c39d94c",
+        "name": "HTTP Request2"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.bridgeapi.io/v3/aggregation/authorization/token",
+          "sendHeaders": true,
+          "specifyHeaders": "json",
+          "jsonHeaders": "{\n  \"Bridge-Version\": \"2025-01-15\",\n  \"Client-Id\": \"sandbox_id_08271d6127534385918650e90112774d\",\n  \"Client-Secret\":\"sandbox_secret_kPUJ07NSFUHgRnkK7o1VDyQgGZBTgGKGAAdcolPeXC7eymp8kclQBgb0n1JmJydt\",\n  \"Content-Type\": \"application/json\"\n}",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={ \"user_uuid\": \"{{ $json.body.uuid }}\" }",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.3,
+        "position": [
+          1104,
+          320
+        ],
+        "id": "35401635-449d-48e4-973f-e866e798067d",
+        "name": "HTTP Request3"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.bridgeapi.io/v3/aggregation/connect-sessions",
+          "sendHeaders": true,
+          "specifyHeaders": "json",
+          "jsonHeaders": "={\n  \"Authorization\": \"Bearer {{ $json.access_token }}\",\n  \"Bridge-Version\": \"2025-01-15\",\n  \"Client-Id\": \"sandbox_id_08271d6127534385918650e90112774d\",\n  \"Client-Secret\": \"sandbox_secret_kPUJ07NSFUHgRnkK7o1VDyQgGZBTgGKGAAdcolPeXC7eymp8kclQBgb0n1JmJydt\",\n  \"Content-Type\": \"application/json\"\n} ",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "{\n  \"user_email\": \"user@test.com\",\n  \"callback_url\": \"http://nonconsorting-cathy-royally.ngrok-free.dev/webhook-test/bridge-callback\"\n}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.3,
+        "position": [
+          1408,
+          320
+        ],
+        "id": "ae501a38-a1d3-4b4c-9d2a-5cf6d988424b",
+        "name": "HTTP Request4"
+      },
+      {
+        "parameters": {
+          "mode": "raw",
+          "jsonOutput": "={\n  \"user_email\": \"user@test.com\",\n  \"callback_url\": \"{{$json.callback_url}}\",\n  \"uuid\": \"{{ $('HTTP Request3').item.json.user.uuid }}\"\n  \n}",
+          "includeOtherFields": true,
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          2128,
+          320
+        ],
+        "id": "cf06c98a-ab3e-4de4-9d71-3353263f072d",
+        "name": "Edit Fields1"
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "tableId": "Users",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "id_telegram",
+                "condition": "eq",
+                "keyValue": "={{ $('Edit Fields').item.json.id_telegram }}"
+              }
+            ]
+          },
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "uuid",
+                "fieldValue": "={{ $('HTTP Request3').item.json.user.uuid }}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          1712,
+          320
+        ],
+        "id": "cb8b57ef-e0f7-426b-b88a-ffaf9b527d7a",
+        "name": "Update a row1",
+        "credentials": {
+          "supabaseApi": {
+            "id": "h7LAli2C03QNpkjp",
+            "name": "Supabase account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "When Executed by Another Workflow": {
+        "main": [
+          [
+            {
+              "node": "Edit Fields",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Edit Fields": {
+        "main": [
+          [
+            {
+              "node": "HTTP Request2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "HTTP Request2": {
+        "main": [
+          [
+            {
+              "node": "HTTP Request3",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "HTTP Request3": {
+        "main": [
+          [
+            {
+              "node": "HTTP Request4",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "HTTP Request4": {
+        "main": [
+          [
+            {
+              "node": "Update a row1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Update a row1": {
+        "main": [
+          [
+            {
+              "node": "Edit Fields1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Maximilien Borne",
+    "name": "Version 86561683",
+    "description": "",
+    "autosaved": false,
+    "workflowPublishHistory": [
+      {
+        "createdAt": "2025-12-22T14:25:03.117Z",
+        "id": 31,
+        "workflowId": "lLSKvqmpw0A8yYdR",
+        "versionId": "86561683-3e7c-42e2-b791-0f0e4c484ce1",
+        "event": "activated",
+        "userId": "570e55b9-573e-4a41-afcc-59cd77b6ae62"
+      }
+    ]
+  }
+}
