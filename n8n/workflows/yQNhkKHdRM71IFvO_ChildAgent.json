@@ -1,0 +1,1008 @@
+{
+  "updatedAt": "2025-12-18T13:06:33.238Z",
+  "createdAt": "2025-12-16T21:21:23.747Z",
+  "id": "yQNhkKHdRM71IFvO",
+  "name": "ChildAgent",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "uuid"
+            },
+            {
+              "name": "external_name"
+            },
+            {
+              "name": "input"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -512,
+        0
+      ],
+      "id": "4bc9a4d8-7b67-4a59-9697-a43c06e4196f",
+      "name": "When Executed by Another Workflow",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"query\": {{ $json.input }},\n  \"external_name\": {{ $json.external_name }},\n  \"uuid\": {{ $json.uuid }}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -224,
+        0
+      ],
+      "id": "496d4745-e7f7-4153-84a1-3494955d2e91",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.bridgeapi.io/v3/aggregation/users",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n  \"Bridge-Version\": \"2025-01-15\",\n  \"Client-Id\": \"sandbox_id_08271d6127534385918650e90112774d\",\n  \"Client-Secret\": \"sandbox_secret_kPUJ07NSFUHgRnkK7o1VDyQgGZBTgGKGAAdcolPeXC7eymp8kclQBgb0n1JmJydt\",\n  \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"external_user_id\": {{ $json.uuid }} }",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        192,
+        16
+      ],
+      "id": "72967c11-2f90-4491-b9f3-111851107611",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.bridgeapi.io/v3/aggregation/authorization/token",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n  \"Bridge-Version\": \"2025-01-15\",\n  \"Client-Id\": \"sandbox_id_08271d6127534385918650e90112774d\",\n  \"Client-Secret\":\"sandbox_secret_kPUJ07NSFUHgRnkK7o1VDyQgGZBTgGKGAAdcolPeXC7eymp8kclQBgb0n1JmJydt\",\n  \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"user_uuid\": \"{{ $json.uuid }}\" }",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        720,
+        32
+      ],
+      "id": "ac6148b3-921e-4d94-a054-b0e88ae289fa",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.bridgeapi.io/v3/aggregation/connect-sessions",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={\n  \"Authorization\": \"Bearer {{ $json.access_token }}\",\n  \"Bridge-Version\": \"2025-01-15\",\n  \"Client-Id\": \"sandbox_id_08271d6127534385918650e90112774d\",\n  \"Client-Secret\": \"sandbox_secret_kPUJ07NSFUHgRnkK7o1VDyQgGZBTgGKGAAdcolPeXC7eymp8kclQBgb0n1JmJydt\",\n  \"Content-Type\": \"application/json\"\n} ",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"user_email\": \"user@test.com\",\n  \"callback_url\": \"http://nonconsorting-cathy-royally.ngrok-free.dev/webhook-test/bridge-callback\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1104,
+        48
+      ],
+      "id": "de1a7da2-6cb6-4bf4-895b-991993fe7a88",
+      "name": "HTTP Request4"
+    },
+    {
+      "parameters": {
+        "tableId": "Users",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "uuid",
+              "fieldValue": "={{ $json.uuid }}"
+            },
+            {
+              "fieldId": "external_name",
+              "fieldValue": "={{ $json.external_user_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        496,
+        32
+      ],
+      "id": "9c31cf13-bfc7-4336-a19f-616e233ee114",
+      "name": "Create a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "h7LAli2C03QNpkjp",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "path": "bridge-callback",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        80,
+        1392
+      ],
+      "id": "ed1cd57c-d5ea-416f-92f7-d8ec379bfcaa",
+      "name": "Webhook",
+      "webhookId": "feaac5eb-32bb-4d2d-9c44-6b0b6350adea"
+    },
+    {
+      "parameters": {
+        "url": "https://api.bridgeapi.io/v3/aggregation/accounts",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={\n  \"Authorization\": \"Bearer {{ $json.access_token }} \",\n  \"Bridge-Version\": \"2025-01-15\",\n  \"Client-Id\": \"sandbox_id_08271d6127534385918650e90112774d\",\n  \"Client-Secret\": \"sandbox_secret_kPUJ07NSFUHgRnkK7o1VDyQgGZBTgGKGAAdcolPeXC7eymp8kclQBgb0n1JmJydt\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        496,
+        1392
+      ],
+      "id": "33dfdca9-451b-4e39-95de-cafe32665b48",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.bridgeapi.io/v3/aggregation/transactions?account_uuid={{$json.uuid}}",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={\n  \"Authorization\": \"Bearer {{ $json.access_token }} \",\n  \"Bridge-Version\": \"2025-01-15\",\n  \"Client-Id\": \"sandbox_id_08271d6127534385918650e90112774d\",\n  \"Client-Secret\": \"sandbox_secret_kPUJ07NSFUHgRnkK7o1VDyQgGZBTgGKGAAdcolPeXC7eymp8kclQBgb0n1JmJydt\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -464,
+        1296
+      ],
+      "id": "ae2bf84e-4945-4ee5-8359-7a06ca41d106",
+      "name": "HTTP Request5"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.bridgeapi.io/v3/aggregation/authorization/token",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n  \"Bridge-Version\": \"2025-01-15\",\n  \"Client-Id\": \"sandbox_id_08271d6127534385918650e90112774d\",\n  \"Client-Secret\": \"sandbox_secret_kPUJ07NSFUHgRnkK7o1VDyQgGZBTgGKGAAdcolPeXC7eymp8kclQBgb0n1JmJydt\",\n  \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"user_uuid\": \"{{$json.query.user_uuid}}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        288,
+        1392
+      ],
+      "id": "ba316bcb-5ba7-467b-889d-4e46a288b6cd",
+      "name": "HTTP Request6"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=l utilisateur a pour ID : {{ $json.query }} Vérifier si l utilisateur existe en base de donnee supabase dans la table Users, si c est pas le cas creer le ",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        3136,
+        336
+      ],
+      "id": "9dd62b68-5b5d-47bd-b6e2-3e0ddb6a9312",
+      "name": "AI Agent1",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "model": "llama3.1:8b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        3008,
+        544
+      ],
+      "id": "ad9981fd-c5a2-4f85-b2bc-8d11d26337f0",
+      "name": "Ollama Chat Model1",
+      "credentials": {
+        "ollamaApi": {
+          "id": "6l4JjfOyCB2Uk6dI",
+          "name": "Ollama account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"status\": \"ok\",\n  \"query\": {{$json.query}},\n  \"from\": {{$json.from}},\n  \"message_id\": {{$json.message_id}},\n  \"text\": {{$json.text}}\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2816,
+        336
+      ],
+      "id": "7cf69900-4114-48ed-b5aa-717b1546ec8c",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "Users",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "external_name",
+              "keyValue": "={{ $json.query }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        3216,
+        672
+      ],
+      "id": "6fca6677-3b47-4879-9ae9-4423006f5919",
+      "name": "Get a row in Supabase1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "h7LAli2C03QNpkjp",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "Users",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "external_name",
+              "fieldValue": "={{ $json.query }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        3408,
+        672
+      ],
+      "id": "9505e9b7-ed64-4c91-afcb-b75985bbc2ea",
+      "name": "Create a row in Supabase1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "h7LAli2C03QNpkjp",
+          "name": "Supabase account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "Create a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request3": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a row": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request6": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a row in Supabase1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a row in Supabase1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "82f44b51-fbcb-4b03-9807-3710e358ddda",
+  "activeVersionId": "9f8b9b3e-6e0a-42de-af4f-158415485090",
+  "versionCounter": 66,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2025-12-16T21:21:23.747Z",
+      "createdAt": "2025-12-16T21:21:23.747Z",
+      "role": "workflow:owner",
+      "workflowId": "yQNhkKHdRM71IFvO",
+      "projectId": "IAHu1pQG7dfjTd27",
+      "project": {
+        "updatedAt": "2025-12-11T22:33:03.220Z",
+        "createdAt": "2025-12-11T22:31:39.471Z",
+        "id": "IAHu1pQG7dfjTd27",
+        "name": "Maximilien Borne <maximilien.borne@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "570e55b9-573e-4a41-afcc-59cd77b6ae62",
+        "projectRelations": [
+          {
+            "updatedAt": "2025-12-11T22:31:39.471Z",
+            "createdAt": "2025-12-11T22:31:39.471Z",
+            "userId": "570e55b9-573e-4a41-afcc-59cd77b6ae62",
+            "projectId": "IAHu1pQG7dfjTd27",
+            "user": {
+              "updatedAt": "2026-01-07T08:35:59.818Z",
+              "createdAt": "2025-12-11T22:31:39.257Z",
+              "id": "570e55b9-573e-4a41-afcc-59cd77b6ae62",
+              "email": "maximilien.borne@gmail.com",
+              "firstName": "Maximilien",
+              "lastName": "Borne",
+              "personalizationAnswers": null,
+              "settings": {
+                "userActivated": true,
+                "easyAIWorkflowOnboarded": true,
+                "firstSuccessfulWorkflowId": "NSySTjcSvLewMF1T",
+                "userActivatedAt": 1765806789336
+              },
+              "disabled": false,
+              "mfaEnabled": false,
+              "lastActiveAt": "2026-01-07",
+              "isPending": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": {
+    "updatedAt": "2025-12-18T12:15:28.901Z",
+    "createdAt": "2025-12-18T12:15:28.901Z",
+    "versionId": "9f8b9b3e-6e0a-42de-af4f-158415485090",
+    "workflowId": "yQNhkKHdRM71IFvO",
+    "nodes": [
+      {
+        "parameters": {
+          "workflowInputs": {
+            "values": [
+              {
+                "name": "uuid"
+              },
+              {
+                "name": "external_name"
+              },
+              {
+                "name": "input"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          -512,
+          0
+        ],
+        "id": "4bc9a4d8-7b67-4a59-9697-a43c06e4196f",
+        "name": "When Executed by Another Workflow",
+        "alwaysOutputData": true
+      },
+      {
+        "parameters": {
+          "mode": "raw",
+          "jsonOutput": "={\n  \"query\": {{ $json.input }},\n  \"external_name\": {{ $json.external_name }},\n  \"uuid\": {{ $json.uuid }}\n}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          -224,
+          0
+        ],
+        "id": "496d4745-e7f7-4153-84a1-3494955d2e91",
+        "name": "Edit Fields"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.bridgeapi.io/v3/aggregation/users",
+          "sendHeaders": true,
+          "specifyHeaders": "json",
+          "jsonHeaders": "{\n  \"Bridge-Version\": \"2025-01-15\",\n  \"Client-Id\": \"sandbox_id_08271d6127534385918650e90112774d\",\n  \"Client-Secret\": \"sandbox_secret_kPUJ07NSFUHgRnkK7o1VDyQgGZBTgGKGAAdcolPeXC7eymp8kclQBgb0n1JmJydt\",\n  \"Content-Type\": \"application/json\"\n}",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={ \"external_user_id\": \"test15\" }",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.3,
+        "position": [
+          240,
+          944
+        ],
+        "id": "72967c11-2f90-4491-b9f3-111851107611",
+        "name": "HTTP Request2"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.bridgeapi.io/v3/aggregation/authorization/token",
+          "sendHeaders": true,
+          "specifyHeaders": "json",
+          "jsonHeaders": "{\n  \"Bridge-Version\": \"2025-01-15\",\n  \"Client-Id\": \"sandbox_id_08271d6127534385918650e90112774d\",\n  \"Client-Secret\":\"sandbox_secret_kPUJ07NSFUHgRnkK7o1VDyQgGZBTgGKGAAdcolPeXC7eymp8kclQBgb0n1JmJydt\",\n  \"Content-Type\": \"application/json\"\n}",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={ \"user_uuid\": \"{{ $json.uuid }}\" }",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.3,
+        "position": [
+          688,
+          944
+        ],
+        "id": "ac6148b3-921e-4d94-a054-b0e88ae289fa",
+        "name": "HTTP Request3"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.bridgeapi.io/v3/aggregation/connect-sessions",
+          "sendHeaders": true,
+          "specifyHeaders": "json",
+          "jsonHeaders": "={\n  \"Authorization\": \"Bearer {{ $json.access_token }}\",\n  \"Bridge-Version\": \"2025-01-15\",\n  \"Client-Id\": \"sandbox_id_08271d6127534385918650e90112774d\",\n  \"Client-Secret\": \"sandbox_secret_kPUJ07NSFUHgRnkK7o1VDyQgGZBTgGKGAAdcolPeXC7eymp8kclQBgb0n1JmJydt\",\n  \"Content-Type\": \"application/json\"\n} ",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "{\n  \"user_email\": \"user@test.com\",\n  \"callback_url\": \"http://nonconsorting-cathy-royally.ngrok-free.dev/webhook-test/bridge-callback\"\n}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.3,
+        "position": [
+          896,
+          944
+        ],
+        "id": "de1a7da2-6cb6-4bf4-895b-991993fe7a88",
+        "name": "HTTP Request4"
+      },
+      {
+        "parameters": {
+          "tableId": "Users",
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "uuid",
+                "fieldValue": "={{ $json.uuid }}"
+              },
+              {
+                "fieldId": "external_name",
+                "fieldValue": "={{ $json.external_user_id }}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          464,
+          944
+        ],
+        "id": "9c31cf13-bfc7-4336-a19f-616e233ee114",
+        "name": "Create a row",
+        "credentials": {
+          "supabaseApi": {
+            "id": "h7LAli2C03QNpkjp",
+            "name": "Supabase account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "path": "bridge-callback",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          80,
+          1392
+        ],
+        "id": "ed1cd57c-d5ea-416f-92f7-d8ec379bfcaa",
+        "name": "Webhook",
+        "webhookId": "feaac5eb-32bb-4d2d-9c44-6b0b6350adea"
+      },
+      {
+        "parameters": {
+          "url": "https://api.bridgeapi.io/v3/aggregation/accounts",
+          "sendHeaders": true,
+          "specifyHeaders": "json",
+          "jsonHeaders": "={\n  \"Authorization\": \"Bearer {{ $json.access_token }} \",\n  \"Bridge-Version\": \"2025-01-15\",\n  \"Client-Id\": \"sandbox_id_08271d6127534385918650e90112774d\",\n  \"Client-Secret\": \"sandbox_secret_kPUJ07NSFUHgRnkK7o1VDyQgGZBTgGKGAAdcolPeXC7eymp8kclQBgb0n1JmJydt\"\n}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.3,
+        "position": [
+          496,
+          1392
+        ],
+        "id": "33dfdca9-451b-4e39-95de-cafe32665b48",
+        "name": "HTTP Request1"
+      },
+      {
+        "parameters": {
+          "url": "=https://api.bridgeapi.io/v3/aggregation/transactions?account_uuid={{$json.uuid}}",
+          "sendHeaders": true,
+          "specifyHeaders": "json",
+          "jsonHeaders": "={\n  \"Authorization\": \"Bearer {{ $json.access_token }} \",\n  \"Bridge-Version\": \"2025-01-15\",\n  \"Client-Id\": \"sandbox_id_08271d6127534385918650e90112774d\",\n  \"Client-Secret\": \"sandbox_secret_kPUJ07NSFUHgRnkK7o1VDyQgGZBTgGKGAAdcolPeXC7eymp8kclQBgb0n1JmJydt\"\n}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.3,
+        "position": [
+          -464,
+          1296
+        ],
+        "id": "ae2bf84e-4945-4ee5-8359-7a06ca41d106",
+        "name": "HTTP Request5"
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "tableId": "Users",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "external_name",
+                "keyValue": "test15"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          48,
+          1056
+        ],
+        "id": "ac2eddf2-a82a-4a92-8601-a3799cb50e77",
+        "name": "Get a row",
+        "alwaysOutputData": true,
+        "credentials": {
+          "supabaseApi": {
+            "id": "h7LAli2C03QNpkjp",
+            "name": "Supabase account"
+          }
+        }
+      },
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.manualTrigger",
+        "typeVersion": 1,
+        "position": [
+          -288,
+          864
+        ],
+        "id": "6588eae2-91ab-49de-9caf-82ffb9956a54",
+        "name": "When clicking ‘Execute workflow’",
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.bridgeapi.io/v3/aggregation/authorization/token",
+          "sendHeaders": true,
+          "specifyHeaders": "json",
+          "jsonHeaders": "{\n  \"Bridge-Version\": \"2025-01-15\",\n  \"Client-Id\": \"sandbox_id_08271d6127534385918650e90112774d\",\n  \"Client-Secret\": \"sandbox_secret_kPUJ07NSFUHgRnkK7o1VDyQgGZBTgGKGAAdcolPeXC7eymp8kclQBgb0n1JmJydt\",\n  \"Content-Type\": \"application/json\"\n}",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={\n  \"user_uuid\": \"{{$json.query.user_uuid}}\"\n}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.3,
+        "position": [
+          288,
+          1392
+        ],
+        "id": "ba316bcb-5ba7-467b-889d-4e46a288b6cd",
+        "name": "HTTP Request6"
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "=l utilisateur a pour ID : {{ $json.query }} Vérifier si l utilisateur existe en base de donnee supabase dans la table Users, si c est pas le cas creer le ",
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 3,
+        "position": [
+          3136,
+          336
+        ],
+        "id": "9dd62b68-5b5d-47bd-b6e2-3e0ddb6a9312",
+        "name": "AI Agent1",
+        "alwaysOutputData": true
+      },
+      {
+        "parameters": {
+          "model": "llama3.1:8b",
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+        "typeVersion": 1,
+        "position": [
+          3008,
+          544
+        ],
+        "id": "ad9981fd-c5a2-4f85-b2bc-8d11d26337f0",
+        "name": "Ollama Chat Model1",
+        "credentials": {
+          "ollamaApi": {
+            "id": "6l4JjfOyCB2Uk6dI",
+            "name": "Ollama account 2"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "mode": "raw",
+          "jsonOutput": "={\n  \"status\": \"ok\",\n  \"query\": {{$json.query}},\n  \"from\": {{$json.from}},\n  \"message_id\": {{$json.message_id}},\n  \"text\": {{$json.text}}\n}\n",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          2816,
+          336
+        ],
+        "id": "7cf69900-4114-48ed-b5aa-717b1546ec8c",
+        "name": "Edit Fields1"
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "tableId": "Users",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "external_name",
+                "keyValue": "={{ $json.query }}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabaseTool",
+        "typeVersion": 1,
+        "position": [
+          3216,
+          672
+        ],
+        "id": "6fca6677-3b47-4879-9ae9-4423006f5919",
+        "name": "Get a row in Supabase1",
+        "credentials": {
+          "supabaseApi": {
+            "id": "h7LAli2C03QNpkjp",
+            "name": "Supabase account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "tableId": "Users",
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "external_name",
+                "fieldValue": "={{ $json.query }}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabaseTool",
+        "typeVersion": 1,
+        "position": [
+          3408,
+          672
+        ],
+        "id": "9505e9b7-ed64-4c91-afcb-b75985bbc2ea",
+        "name": "Create a row in Supabase1",
+        "credentials": {
+          "supabaseApi": {
+            "id": "h7LAli2C03QNpkjp",
+            "name": "Supabase account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "When Executed by Another Workflow": {
+        "main": [
+          [
+            {
+              "node": "Edit Fields",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Edit Fields": {
+        "main": [
+          []
+        ]
+      },
+      "HTTP Request2": {
+        "main": [
+          [
+            {
+              "node": "Create a row",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "HTTP Request3": {
+        "main": [
+          [
+            {
+              "node": "HTTP Request4",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create a row": {
+        "main": [
+          [
+            {
+              "node": "HTTP Request3",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "HTTP Request6",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get a row": {
+        "main": [
+          [
+            {
+              "node": "HTTP Request2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "When clicking ‘Execute workflow’": {
+        "main": [
+          [
+            {
+              "node": "Get a row",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "HTTP Request6": {
+        "main": [
+          [
+            {
+              "node": "HTTP Request1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Ollama Chat Model1": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "AI Agent1",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Edit Fields1": {
+        "main": [
+          [
+            {
+              "node": "AI Agent1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get a row in Supabase1": {
+        "ai_tool": [
+          [
+            {
+              "node": "AI Agent1",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create a row in Supabase1": {
+        "ai_tool": [
+          [
+            {
+              "node": "AI Agent1",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "system migration",
+    "name": null,
+    "description": null,
+    "autosaved": false,
+    "workflowPublishHistory": []
+  }
+}

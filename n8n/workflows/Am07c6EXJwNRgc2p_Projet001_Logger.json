@@ -1,0 +1,387 @@
+{
+  "updatedAt": "2026-01-03T16:46:12.366Z",
+  "createdAt": "2026-01-03T12:59:54.670Z",
+  "id": "Am07c6EXJwNRgc2p",
+  "name": "Projet001_Logger",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "6e7b1b31-3ed8-4898-b58d-d08b7a09658a",
+      "name": "Normalize Inputs",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3,
+      "position": [
+        -80,
+        -64
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const q = ($json.question || '').trim();\nconst a = ($json.answer || '').trim();\nconst ctx = ($json.context || '').trim();\n\n// Petit score simple (optionnel) pour suivre la qualité RAG dans Braintrust\nlet ragScore = 0;\nif (ctx.length > 200) ragScore += 0.5;\nif (a.length > 30) ragScore += 0.5;\n\nreturn [{\n  json: {\n    ...$json,\n    ragScore,\n    hasContext: ctx.length > 0\n  }\n}];"
+      },
+      "id": "5444e7e4-c508-4f5e-967a-15cbd17b3acf",
+      "name": "Compute ragScore",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        176,
+        -64
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.braintrust.dev/v1/project_logs/0966c78f-481a-401a-a039-0b2e276446bd/insert",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer sk-Q8fBY8L7i376cVN0A2X1H0WCZJyrSdLQXrxoQTOZZX9Yoe0f"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  events: [\n    {\n      input: $json.question,\n      output: $json.answer,\n      metadata: {\n        ragScore: $json.ragScore ?? null,\n        hasContext: $json.hasContext ?? null,\n        context: $json.context ?? null,\n        custom: $json.metadata ?? null\n      }\n    }\n  ]\n}) }}",
+        "options": {}
+      },
+      "id": "f963fc07-61a7-482f-b699-12261d11d22a",
+      "name": "Braintrust - Log",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        432,
+        -64
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "id": "7817f43d-5920-4f8e-8507-23ba67de1845",
+      "name": "Return",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        672,
+        -64
+      ]
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "project"
+            },
+            {
+              "name": "question"
+            },
+            {
+              "name": "answer"
+            },
+            {
+              "name": "context"
+            },
+            {
+              "name": "metadata"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -432,
+        -64
+      ],
+      "id": "3f8c4697-9670-478b-a25f-61f0316d6bd6",
+      "name": "When Executed by Another Workflow"
+    }
+  ],
+  "connections": {
+    "Normalize Inputs": {
+      "main": [
+        [
+          {
+            "node": "Compute ragScore",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compute ragScore": {
+      "main": [
+        [
+          {
+            "node": "Braintrust - Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Braintrust - Log": {
+      "main": [
+        [
+          {
+            "node": "Return",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Normalize Inputs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "67f9ef5e-e7a2-4c7c-8730-2a26f89005c7",
+  "activeVersionId": "67f9ef5e-e7a2-4c7c-8730-2a26f89005c7",
+  "versionCounter": 51,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-01-03T12:59:54.670Z",
+      "createdAt": "2026-01-03T12:59:54.670Z",
+      "role": "workflow:owner",
+      "workflowId": "Am07c6EXJwNRgc2p",
+      "projectId": "IAHu1pQG7dfjTd27",
+      "project": {
+        "updatedAt": "2025-12-11T22:33:03.220Z",
+        "createdAt": "2025-12-11T22:31:39.471Z",
+        "id": "IAHu1pQG7dfjTd27",
+        "name": "Maximilien Borne <maximilien.borne@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "570e55b9-573e-4a41-afcc-59cd77b6ae62",
+        "projectRelations": [
+          {
+            "updatedAt": "2025-12-11T22:31:39.471Z",
+            "createdAt": "2025-12-11T22:31:39.471Z",
+            "userId": "570e55b9-573e-4a41-afcc-59cd77b6ae62",
+            "projectId": "IAHu1pQG7dfjTd27",
+            "user": {
+              "updatedAt": "2026-01-07T08:35:59.818Z",
+              "createdAt": "2025-12-11T22:31:39.257Z",
+              "id": "570e55b9-573e-4a41-afcc-59cd77b6ae62",
+              "email": "maximilien.borne@gmail.com",
+              "firstName": "Maximilien",
+              "lastName": "Borne",
+              "personalizationAnswers": null,
+              "settings": {
+                "userActivated": true,
+                "easyAIWorkflowOnboarded": true,
+                "firstSuccessfulWorkflowId": "NSySTjcSvLewMF1T",
+                "userActivatedAt": 1765806789336
+              },
+              "disabled": false,
+              "mfaEnabled": false,
+              "lastActiveAt": "2026-01-07",
+              "isPending": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": {
+    "updatedAt": "2026-01-03T16:46:32.963Z",
+    "createdAt": "2026-01-03T16:46:12.367Z",
+    "versionId": "67f9ef5e-e7a2-4c7c-8730-2a26f89005c7",
+    "workflowId": "Am07c6EXJwNRgc2p",
+    "nodes": [
+      {
+        "parameters": {
+          "options": {}
+        },
+        "id": "6e7b1b31-3ed8-4898-b58d-d08b7a09658a",
+        "name": "Normalize Inputs",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3,
+        "position": [
+          -80,
+          -64
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "const q = ($json.question || '').trim();\nconst a = ($json.answer || '').trim();\nconst ctx = ($json.context || '').trim();\n\n// Petit score simple (optionnel) pour suivre la qualité RAG dans Braintrust\nlet ragScore = 0;\nif (ctx.length > 200) ragScore += 0.5;\nif (a.length > 30) ragScore += 0.5;\n\nreturn [{\n  json: {\n    ...$json,\n    ragScore,\n    hasContext: ctx.length > 0\n  }\n}];"
+        },
+        "id": "5444e7e4-c508-4f5e-967a-15cbd17b3acf",
+        "name": "Compute ragScore",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          176,
+          -64
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.braintrust.dev/v1/project_logs/0966c78f-481a-401a-a039-0b2e276446bd/insert",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "Bearer sk-Q8fBY8L7i376cVN0A2X1H0WCZJyrSdLQXrxoQTOZZX9Yoe0f"
+              },
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({\n  events: [\n    {\n      input: $json.question,\n      output: $json.answer,\n      metadata: {\n        ragScore: $json.ragScore ?? null,\n        hasContext: $json.hasContext ?? null,\n        context: $json.context ?? null,\n        custom: $json.metadata ?? null\n      }\n    }\n  ]\n}) }}",
+          "options": {}
+        },
+        "id": "f963fc07-61a7-482f-b699-12261d11d22a",
+        "name": "Braintrust - Log",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4,
+        "position": [
+          432,
+          -64
+        ]
+      },
+      {
+        "parameters": {
+          "respondWith": "allIncomingItems",
+          "options": {}
+        },
+        "id": "7817f43d-5920-4f8e-8507-23ba67de1845",
+        "name": "Return",
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1,
+        "position": [
+          672,
+          -64
+        ]
+      },
+      {
+        "parameters": {
+          "workflowInputs": {
+            "values": [
+              {
+                "name": "project"
+              },
+              {
+                "name": "question"
+              },
+              {
+                "name": "answer"
+              },
+              {
+                "name": "context"
+              },
+              {
+                "name": "metadata"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          -432,
+          -64
+        ],
+        "id": "3f8c4697-9670-478b-a25f-61f0316d6bd6",
+        "name": "When Executed by Another Workflow"
+      }
+    ],
+    "connections": {
+      "Normalize Inputs": {
+        "main": [
+          [
+            {
+              "node": "Compute ragScore",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Compute ragScore": {
+        "main": [
+          [
+            {
+              "node": "Braintrust - Log",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Braintrust - Log": {
+        "main": [
+          [
+            {
+              "node": "Return",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "When Executed by Another Workflow": {
+        "main": [
+          [
+            {
+              "node": "Normalize Inputs",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Maximilien Borne",
+    "name": "Version 67f9ef5e",
+    "description": "",
+    "autosaved": false,
+    "workflowPublishHistory": [
+      {
+        "createdAt": "2026-01-03T16:46:32.961Z",
+        "id": 48,
+        "workflowId": "Am07c6EXJwNRgc2p",
+        "versionId": "67f9ef5e-e7a2-4c7c-8730-2a26f89005c7",
+        "event": "activated",
+        "userId": "570e55b9-573e-4a41-afcc-59cd77b6ae62"
+      }
+    ]
+  }
+}

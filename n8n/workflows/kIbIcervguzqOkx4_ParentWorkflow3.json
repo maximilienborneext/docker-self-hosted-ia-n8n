@@ -1,0 +1,850 @@
+{
+  "updatedAt": "2025-12-22T17:37:49.999Z",
+  "createdAt": "2025-12-17T09:23:00.943Z",
+  "id": "kIbIcervguzqOkx4",
+  "name": "ParentWorkflow3",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -640,
+        -16
+      ],
+      "id": "2e45952c-bebe-4507-9d7b-978b9dcbe2eb",
+      "name": "When chat message received",
+      "webhookId": "60a495c0-827d-42ad-88a3-3b1f30820389"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"external_name\": \"Maximilien Borne\",\n  \"message_id\": \"123,\n  \"id_telegram\": \"{{ $json.sessionId }}\",\n  \"from_id\": 123,\n  \"input\": \"{{ $json.chatInput }}\"\n}\n",
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -352,
+        -16
+      ],
+      "id": "a422d656-8624-4acc-8045-2dac6c51a7cc",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "tableId": "Users",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "external_name",
+              "fieldValue": "={{ $json.external_name }}"
+            },
+            {
+              "fieldId": "id_telegram",
+              "fieldValue": "={{ $json.id_telegram }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        496,
+        576
+      ],
+      "id": "e60ab094-e2d0-4ffe-be0f-a9273925be24",
+      "name": "CreateUser",
+      "credentials": {
+        "supabaseApi": {
+          "id": "h7LAli2C03QNpkjp",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "Users"
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        640,
+        560
+      ],
+      "id": "80513061-5b65-4af4-88d4-b66ed537fdd8",
+      "name": "GetAllUsers",
+      "credentials": {
+        "supabaseApi": {
+          "id": "h7LAli2C03QNpkjp",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "Users",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id_telegram",
+              "keyValue": "={{ $json.id_telegram }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        800,
+        576
+      ],
+      "id": "fbc2ab01-092a-4eaf-82ac-e76b93a83c17",
+      "name": "GetSingleUser",
+      "credentials": {
+        "supabaseApi": {
+          "id": "h7LAli2C03QNpkjp",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1552,
+        432
+      ],
+      "id": "5a917b1c-a1e3-4f52-97c3-7e85056cb227",
+      "name": "Telegram Trigger",
+      "webhookId": "e0a0dcc5-b1f0-4cbc-a583-e15805dbc6c0",
+      "credentials": {
+        "telegramApi": {
+          "id": "sGClvlRJ30rg1jXf",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://api.telegram.org/bot8529802168:AAEyaUKDgaDxIxcfCNSAfv4YW2IY9KdO_DE/getFile",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "file_id",
+              "value": "={{ $('Telegram Trigger').item.json.message.voice.file_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1120,
+        432
+      ],
+      "id": "16d4205d-3286-4818-9b26-29c1daa803bd",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.telegram.org/file/bot8529802168:AAEyaUKDgaDxIxcfCNSAfv4YW2IY9KdO_DE/{{$json.result.file_path}}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file",
+              "outputPropertyName": "audio"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -944,
+        432
+      ],
+      "id": "4add7b95-14d4-43f6-ab60-94093d2ddc30",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "binaryPropertyName": "=audio",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        -752,
+        432
+      ],
+      "id": "7a826b03-59d3-47b6-9b92-876f621b7849",
+      "name": "Transcribe a recording",
+      "credentials": {
+        "openAiApi": {
+          "id": "q0SovBRAM8uAguqi",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        160,
+        416
+      ],
+      "id": "3444e4da-8205-444e-9824-7af8e736b2cf",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "q0SovBRAM8uAguqi",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Agent Bancaire\nPermet la récupération des informations bancaires depuis Bridge API\n\n\n[Documentation](https://docs.n8n.io/workflows/components/sticky-notes/)",
+        "height": 272,
+        "width": 416,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1536,
+        432
+      ],
+      "typeVersion": 1,
+      "id": "59bcc5fd-3e55-4731-8283-5eb862a155cf",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Agent Utilisateur\nPermet la récupération des informations bancaires depuis Bridge API\n\n\n[Documentation](https://docs.n8n.io/workflows/components/sticky-notes/)",
+        "height": 272,
+        "width": 432,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        464,
+        416
+      ],
+      "typeVersion": 1,
+      "id": "bad55d82-719f-4ecd-9cd2-962f1b0981f9",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Flux de transformation d'un message vocal en message textuel\n....\n\n\n[Documentation](https://docs.n8n.io/workflows/components/sticky-notes/)",
+        "height": 336,
+        "width": 1312,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1664,
+        288
+      ],
+      "typeVersion": 1,
+      "id": "783092b7-7869-4e33-9e45-2ab5217cb7a8",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('UpdatedData').item.json.from_id }}",
+        "text": "={{ $('AI Agent').item.json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1712,
+        128
+      ],
+      "id": "cb137624-dfb9-47a2-bdce-fa878a21efe9",
+      "name": "Send a text message",
+      "webhookId": "b4b275dd-d6c9-4c0b-8aee-b81ccda9c8d1",
+      "credentials": {
+        "telegramApi": {
+          "id": "sGClvlRJ30rg1jXf",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "input": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        1200,
+        -272
+      ],
+      "id": "2362e340-e3ae-4e0e-8cdc-5f9ebf644b20",
+      "name": "Generate audio",
+      "credentials": {
+        "openAiApi": {
+          "id": "q0SovBRAM8uAguqi",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendAudio",
+        "chatId": "={{ $('UpdatedData').item.json.chat_id }}",
+        "binaryData": true,
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1440,
+        128
+      ],
+      "id": "94526464-e850-4215-aa40-48ff4617b159",
+      "name": "Send an audio file",
+      "webhookId": "cc240ab7-bd86-467a-b8fb-786474294a80",
+      "credentials": {
+        "telegramApi": {
+          "id": "sGClvlRJ30rg1jXf",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "lLSKvqmpw0A8yYdR",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/lLSKvqmpw0A8yYdR",
+          "cachedResultName": "AccountAgent"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "external_name": "={{ $json.external_name }}",
+            "input": "={{ $json.input }}",
+            "id_telegram": "={{ $json.id_telegram }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "id_telegram",
+              "displayName": "id_telegram",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "external_name",
+              "displayName": "external_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "input",
+              "displayName": "input",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        1600,
+        928
+      ],
+      "id": "cb22a3b2-8aee-4c2d-be3e-cf42a7c6901c",
+      "name": "GetAccountValue"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Demande utilisateur :\n{{ $json.input }}\nAnalyse cette demande et détermine l’agent à appeler.\n\n- id_telegram: {{ $json.id_telegram }}",
+        "options": {
+          "systemMessage": "Tu es un orchestrateur d’agents. Tu aides un utilisateur à récupérer différents types d’informations, chacun soumis à des règles strictes.\n\nIdentité & prérequis\n- L’utilisateur est identifié par un champ `id_telegram` fourni dans sa toute première demande.\n- Aucune action métier ne doit être exécutée tant que l’utilisateur n’est pas enregistré en base de données.\n- Avant CHAQUE action demandée, tu dois vérifier l’existence de l’utilisateur en base à partir de son `id_telegram`.\n  - Si l’utilisateur n’existe pas : tu dois le créer, puis seulement ensuite autoriser les autres actions.\n  - Si l’utilisateur existe : tu peux exécuter les actions demandées via les sous-agents.\n\nSous-agents disponibles\n1) Sous-agent “Opérateur Utilisateurs”\n   - Vérifier si un utilisateur existe (par `id_telegram`)\n   - Créer un utilisateur\n   - Lister tous les utilisateurs\n2) Sous-agent “Opérateur Bancaire”\n   - Permet à l’utilisateur d’accéder à ses informations bancaires\n\nRègles de sécurité et d’orchestration\n- Il est strictement interdit d’appeler le sous-agent “Opérateur Bancaire” si l’utilisateur n’existe pas en base.\n- Si l’utilisateur demande des informations bancaires et que l’utilisateur n’existe pas :\n  1) Appeler le sous-agent “Opérateur Utilisateurs” pour créer l’utilisateur\n  2) Puis seulement appeler le sous-agent “Opérateur Bancaire”\n- Tu ne dois jamais inventer de `uuid` ni de données.\n- Si le `uuid` est absent ou ambigu, tu dois demander à l’utilisateur de le fournir avant toute action.\n- Tu dois choisir l’action minimale nécessaire et éviter les appels d’outils inutiles.\n- Ta réponse doit être factuelle, courte, et orientée exécution (appels de sous-agents ou demande d’information manquante)."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        320,
+        -224
+      ],
+      "id": "f8521976-f39a-4ec8-bdcd-37da2d572c20",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        192,
+        48
+      ],
+      "id": "215e1c35-7592-4c09-84e5-32a999b1dfb2",
+      "name": "OpenAI Chat Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "q0SovBRAM8uAguqi",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "=\n{\n  \"external_name\": \"{{ $json.message.chat.first_name }}_{{ $json.message.chat.last_name }}\",\n  \"id_telegram\": \"{{ $json.message.from.id }}\",\n  \"from_id\": \"{{ $json.message.from.id }}\",\n  \"chat_id\": \"{{$json.message.chat.id}}\"\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1344,
+        432
+      ],
+      "id": "521a86ba-479f-4a1f-96cb-7a8e41c5bcba",
+      "name": "Data",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "=\n{\n  \"external_name\": \"{{ $('Data').item.json.external_name }},\n  \"id_telegram\": \"{{ $('Data').item.json.id_telegram }}\",\n  \"input\": \"{{ $json.text }}\"\n} ",
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -544,
+        432
+      ],
+      "id": "a7049268-5205-4ea0-86d2-af891343a7a4",
+      "name": "UpdatedData"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        992,
+        704
+      ],
+      "id": "1463cfcc-ba07-4ff7-8989-8779426f452b",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "q0SovBRAM8uAguqi",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "text": "=Demande utilisateur :\n{{ $json.input }}\n\nContexte disponible :\n- external_name: {{ $json.external_name }}\n- id_telegram: {{ $json.id_telegram }}",
+        "options": {
+          "systemMessage": "Tu es l’agent \"User Operator\".\n\nActions possibles :\n1) GET_USER\n   - Vérifier si un utilisateur existe à partir de son id_telegram (id_telegram uniquement)\n   - Si il n'existe pas, crée le CREATE_USER\n\n2) CREATE_USER\n   - Créer un utilisateur avec (id_telegram, external_name)\n   - Cette action n’est autorisée QUE si l’utilisateur n’existe pas déjà\n    - Tu ne dois jamais demander confirmation pour créer un utilisateur, tu D0IS le faire par toi même\n\n3) LIST_USERS\n   - Lister tous les utilisateurs\n\nRègles :\n- Tu ne dois jamais inventer de valeurs (id_telegram, external_name, etc.).\nCREATE_USER (conditions strictes) :\n- Avant toute création, tu dois t’assurer que l’utilisateur n’existe pas déjà (GET_USER).\n\nAmbiguïté :\n- Si la demande est ambiguë ou ne correspond pas clairement à une action, pose UNE SEULE question courte de clarification."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "typeVersion": 3,
+      "position": [
+        336,
+        176
+      ],
+      "id": "a29620da-90bc-4ec6-8a02-b93cad934455",
+      "name": "User Operator"
+    },
+    {
+      "parameters": {
+        "toolDescription": "=Agent bancaire",
+        "text": "=Demande  :\n{{ $json.input }}\n\nContexte :\n\n- id_telegram: {{ $json.id_telegram }}\n- external_name : {{ $json.external_name }}\n\n\nUtilise les outils disponibles pour répondre à la demande.",
+        "options": {
+          "systemMessage": "Tu es un agent IA spécialisé dans la récupération d’informations bancaires\n\nTon rôle est d’orchestrer les actions nécessaires pour \n1. Ouvrir le sub-worflow\n\nContraintes importantes :\n- Tu ne fais AUCUNE supposition.\n- Tu n’inventes jamais de données.\n- Quand tu appelles le sub-workflow,\ntu DOIS fournir TOUJOURS :\n- {{ $json.id_telegram }}\n- {{ $json.external_name }}\n- {{ $json.from_id }}\n- {{ $json.input }}\n\nTu dois raisonner étape par étape, mais tu ne montres jamais ton raisonnement.\nTu produis soit :\n- un appel d’outil\n- soit une réponse finale claire pour l’utilisateur.\n\n\nLe format de sortie est OBLIGATOIRE et doit toujours être respecté :\n\n{\n  \"user_email\": \"ok | error\",\n  \"callback_url\": \"string | null\",\n  \"uuid\": \"string\"\n}\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "typeVersion": 3,
+      "position": [
+        1088,
+        528
+      ],
+      "id": "5bbe4269-f8b1-4759-a845-598bb0c9dff4",
+      "name": "Banque Operator"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"uuid\": \"{{ $json.input }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        672,
+        -224
+      ],
+      "id": "0f15e134-e2d2-493f-bb7e-525ec844f0fd",
+      "name": "Edit Fields1"
+    }
+  ],
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CreateUser": {
+      "ai_tool": [
+        [
+          {
+            "node": "User Operator",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GetAllUsers": {
+      "ai_tool": [
+        [
+          {
+            "node": "User Operator",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GetSingleUser": {
+      "ai_tool": [
+        [
+          {
+            "node": "User Operator",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Transcribe a recording",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe a recording": {
+      "main": [
+        [
+          {
+            "node": "UpdatedData",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "User Operator",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate audio": {
+      "main": [
+        [
+          {
+            "node": "Send an audio file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send an audio file": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GetAccountValue": {
+      "ai_tool": [
+        [
+          {
+            "node": "Banque Operator",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Data": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "UpdatedData": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Banque Operator",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "User Operator": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Banque Operator": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Generate audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "3c692773-adc5-48f8-a139-913bda2ba43c",
+  "activeVersionId": null,
+  "versionCounter": 170,
+  "triggerCount": 2,
+  "shared": [
+    {
+      "updatedAt": "2025-12-17T09:23:00.943Z",
+      "createdAt": "2025-12-17T09:23:00.943Z",
+      "role": "workflow:owner",
+      "workflowId": "kIbIcervguzqOkx4",
+      "projectId": "IAHu1pQG7dfjTd27",
+      "project": {
+        "updatedAt": "2025-12-11T22:33:03.220Z",
+        "createdAt": "2025-12-11T22:31:39.471Z",
+        "id": "IAHu1pQG7dfjTd27",
+        "name": "Maximilien Borne <maximilien.borne@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "570e55b9-573e-4a41-afcc-59cd77b6ae62",
+        "projectRelations": [
+          {
+            "updatedAt": "2025-12-11T22:31:39.471Z",
+            "createdAt": "2025-12-11T22:31:39.471Z",
+            "userId": "570e55b9-573e-4a41-afcc-59cd77b6ae62",
+            "projectId": "IAHu1pQG7dfjTd27",
+            "user": {
+              "updatedAt": "2026-01-07T08:35:59.818Z",
+              "createdAt": "2025-12-11T22:31:39.257Z",
+              "id": "570e55b9-573e-4a41-afcc-59cd77b6ae62",
+              "email": "maximilien.borne@gmail.com",
+              "firstName": "Maximilien",
+              "lastName": "Borne",
+              "personalizationAnswers": null,
+              "settings": {
+                "userActivated": true,
+                "easyAIWorkflowOnboarded": true,
+                "firstSuccessfulWorkflowId": "NSySTjcSvLewMF1T",
+                "userActivatedAt": 1765806789336
+              },
+              "disabled": false,
+              "mfaEnabled": false,
+              "lastActiveAt": "2026-01-07",
+              "isPending": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": null
+}

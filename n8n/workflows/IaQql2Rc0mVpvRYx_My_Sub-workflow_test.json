@@ -1,0 +1,423 @@
+{
+  "updatedAt": "2025-12-16T20:04:13.003Z",
+  "createdAt": "2025-12-16T20:04:13.003Z",
+  "id": "IaQql2Rc0mVpvRYx",
+  "name": "My Sub-workflow test",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "preBuiltAgentsCalloutHttpRequest": "",
+        "curlImport": "",
+        "method": "POST",
+        "url": "https://api.bridgeapi.io/v3/aggregation/users",
+        "authentication": "none",
+        "provideSslCertificates": false,
+        "sendQuery": false,
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n  \"Bridge-Version\": \"2025-01-15\",\n  \"Client-Id\": \"sandbox_id_08271d6127534385918650e90112774d\",\n  \"Client-Secret\": \"sandbox_secret_kPUJ07NSFUHgRnkK7o1VDyQgGZBTgGKGAAdcolPeXC7eymp8kclQBgb0n1JmJydt\",\n  \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={ \"external_user_id\": \"test15\" }",
+        "options": {},
+        "infoMessage": ""
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        528,
+        624
+      ],
+      "id": "5cf62c19-d602-4f77-aed9-bf70d0b8bb84",
+      "name": "HTTP Request2",
+      "disabled": false
+    },
+    {
+      "parameters": {
+        "preBuiltAgentsCalloutHttpRequest": "",
+        "curlImport": "",
+        "method": "POST",
+        "url": "https://api.bridgeapi.io/v3/aggregation/authorization/token",
+        "authentication": "none",
+        "provideSslCertificates": false,
+        "sendQuery": false,
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n  \"Bridge-Version\": \"2025-01-15\",\n  \"Client-Id\": \"sandbox_id_08271d6127534385918650e90112774d\",\n  \"Client-Secret\":\"sandbox_secret_kPUJ07NSFUHgRnkK7o1VDyQgGZBTgGKGAAdcolPeXC7eymp8kclQBgb0n1JmJydt\",\n  \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={ \"user_uuid\": \"{{ $json.uuid }}\" }",
+        "options": {},
+        "infoMessage": ""
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        976,
+        624
+      ],
+      "id": "4c618239-a33d-41a3-8edd-1a514a3c08a8",
+      "name": "HTTP Request3",
+      "disabled": false
+    },
+    {
+      "parameters": {
+        "preBuiltAgentsCalloutHttpRequest": "",
+        "curlImport": "",
+        "method": "POST",
+        "url": "https://api.bridgeapi.io/v3/aggregation/connect-sessions",
+        "authentication": "none",
+        "provideSslCertificates": false,
+        "sendQuery": false,
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={\n  \"Authorization\": \"Bearer {{ $json.access_token }}\",\n  \"Bridge-Version\": \"2025-01-15\",\n  \"Client-Id\": \"sandbox_id_08271d6127534385918650e90112774d\",\n  \"Client-Secret\": \"sandbox_secret_kPUJ07NSFUHgRnkK7o1VDyQgGZBTgGKGAAdcolPeXC7eymp8kclQBgb0n1JmJydt\",\n  \"Content-Type\": \"application/json\"\n} ",
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"user_email\": \"user@test.com\",\n  \"callback_url\": \"http://nonconsorting-cathy-royally.ngrok-free.dev/webhook-test/bridge-callback\"\n}",
+        "options": {},
+        "infoMessage": ""
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1184,
+        624
+      ],
+      "id": "fbecb4ac-c436-485d-bf92-a4ee364031ae",
+      "name": "HTTP Request4",
+      "disabled": false
+    },
+    {
+      "parameters": {
+        "useCustomSchema": false,
+        "resource": "row",
+        "operation": "create",
+        "tableId": "Users",
+        "dataToSend": "defineBelow",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "uuid",
+              "fieldValue": "={{ $json.uuid }}"
+            },
+            {
+              "fieldId": "external_name",
+              "fieldValue": "={{ $json.external_user_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        752,
+        624
+      ],
+      "id": "51addcd8-9b7a-480c-ad45-d69f90df2b22",
+      "name": "Create a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "h7LAli2C03QNpkjp",
+          "name": "Supabase account"
+        }
+      },
+      "disabled": false
+    },
+    {
+      "id": "f9dd7387-e374-4e63-83b0-e52a7d964c82",
+      "typeVersion": 1.1,
+      "name": "Start",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        320,
+        624
+      ],
+      "parameters": {
+        "inputSource": "passthrough"
+      }
+    }
+  ],
+  "connections": {
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "Create a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request3": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a row": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": null,
+  "versionId": "72471eb4-c6f8-4a7a-bc9a-393444258a67",
+  "activeVersionId": "72471eb4-c6f8-4a7a-bc9a-393444258a67",
+  "versionCounter": 29,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-12-16T20:04:13.003Z",
+      "createdAt": "2025-12-16T20:04:13.003Z",
+      "role": "workflow:owner",
+      "workflowId": "IaQql2Rc0mVpvRYx",
+      "projectId": "IAHu1pQG7dfjTd27",
+      "project": {
+        "updatedAt": "2025-12-11T22:33:03.220Z",
+        "createdAt": "2025-12-11T22:31:39.471Z",
+        "id": "IAHu1pQG7dfjTd27",
+        "name": "Maximilien Borne <maximilien.borne@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "570e55b9-573e-4a41-afcc-59cd77b6ae62",
+        "projectRelations": [
+          {
+            "updatedAt": "2025-12-11T22:31:39.471Z",
+            "createdAt": "2025-12-11T22:31:39.471Z",
+            "userId": "570e55b9-573e-4a41-afcc-59cd77b6ae62",
+            "projectId": "IAHu1pQG7dfjTd27",
+            "user": {
+              "updatedAt": "2026-01-07T08:35:59.818Z",
+              "createdAt": "2025-12-11T22:31:39.257Z",
+              "id": "570e55b9-573e-4a41-afcc-59cd77b6ae62",
+              "email": "maximilien.borne@gmail.com",
+              "firstName": "Maximilien",
+              "lastName": "Borne",
+              "personalizationAnswers": null,
+              "settings": {
+                "userActivated": true,
+                "easyAIWorkflowOnboarded": true,
+                "firstSuccessfulWorkflowId": "NSySTjcSvLewMF1T",
+                "userActivatedAt": 1765806789336
+              },
+              "disabled": false,
+              "mfaEnabled": false,
+              "lastActiveAt": "2026-01-07",
+              "isPending": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": {
+    "updatedAt": "2025-12-16T20:04:13.003Z",
+    "createdAt": "2025-12-16T20:04:13.003Z",
+    "versionId": "72471eb4-c6f8-4a7a-bc9a-393444258a67",
+    "workflowId": "IaQql2Rc0mVpvRYx",
+    "nodes": [
+      {
+        "parameters": {
+          "preBuiltAgentsCalloutHttpRequest": "",
+          "curlImport": "",
+          "method": "POST",
+          "url": "https://api.bridgeapi.io/v3/aggregation/users",
+          "authentication": "none",
+          "provideSslCertificates": false,
+          "sendQuery": false,
+          "sendHeaders": true,
+          "specifyHeaders": "json",
+          "jsonHeaders": "{\n  \"Bridge-Version\": \"2025-01-15\",\n  \"Client-Id\": \"sandbox_id_08271d6127534385918650e90112774d\",\n  \"Client-Secret\": \"sandbox_secret_kPUJ07NSFUHgRnkK7o1VDyQgGZBTgGKGAAdcolPeXC7eymp8kclQBgb0n1JmJydt\",\n  \"Content-Type\": \"application/json\"\n}",
+          "sendBody": true,
+          "contentType": "json",
+          "specifyBody": "json",
+          "jsonBody": "={ \"external_user_id\": \"test15\" }",
+          "options": {},
+          "infoMessage": ""
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.3,
+        "position": [
+          528,
+          624
+        ],
+        "id": "5cf62c19-d602-4f77-aed9-bf70d0b8bb84",
+        "name": "HTTP Request2",
+        "disabled": false
+      },
+      {
+        "parameters": {
+          "preBuiltAgentsCalloutHttpRequest": "",
+          "curlImport": "",
+          "method": "POST",
+          "url": "https://api.bridgeapi.io/v3/aggregation/authorization/token",
+          "authentication": "none",
+          "provideSslCertificates": false,
+          "sendQuery": false,
+          "sendHeaders": true,
+          "specifyHeaders": "json",
+          "jsonHeaders": "{\n  \"Bridge-Version\": \"2025-01-15\",\n  \"Client-Id\": \"sandbox_id_08271d6127534385918650e90112774d\",\n  \"Client-Secret\":\"sandbox_secret_kPUJ07NSFUHgRnkK7o1VDyQgGZBTgGKGAAdcolPeXC7eymp8kclQBgb0n1JmJydt\",\n  \"Content-Type\": \"application/json\"\n}",
+          "sendBody": true,
+          "contentType": "json",
+          "specifyBody": "json",
+          "jsonBody": "={ \"user_uuid\": \"{{ $json.uuid }}\" }",
+          "options": {},
+          "infoMessage": ""
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.3,
+        "position": [
+          976,
+          624
+        ],
+        "id": "4c618239-a33d-41a3-8edd-1a514a3c08a8",
+        "name": "HTTP Request3",
+        "disabled": false
+      },
+      {
+        "parameters": {
+          "preBuiltAgentsCalloutHttpRequest": "",
+          "curlImport": "",
+          "method": "POST",
+          "url": "https://api.bridgeapi.io/v3/aggregation/connect-sessions",
+          "authentication": "none",
+          "provideSslCertificates": false,
+          "sendQuery": false,
+          "sendHeaders": true,
+          "specifyHeaders": "json",
+          "jsonHeaders": "={\n  \"Authorization\": \"Bearer {{ $json.access_token }}\",\n  \"Bridge-Version\": \"2025-01-15\",\n  \"Client-Id\": \"sandbox_id_08271d6127534385918650e90112774d\",\n  \"Client-Secret\": \"sandbox_secret_kPUJ07NSFUHgRnkK7o1VDyQgGZBTgGKGAAdcolPeXC7eymp8kclQBgb0n1JmJydt\",\n  \"Content-Type\": \"application/json\"\n} ",
+          "sendBody": true,
+          "contentType": "json",
+          "specifyBody": "json",
+          "jsonBody": "{\n  \"user_email\": \"user@test.com\",\n  \"callback_url\": \"http://nonconsorting-cathy-royally.ngrok-free.dev/webhook-test/bridge-callback\"\n}",
+          "options": {},
+          "infoMessage": ""
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.3,
+        "position": [
+          1184,
+          624
+        ],
+        "id": "fbecb4ac-c436-485d-bf92-a4ee364031ae",
+        "name": "HTTP Request4",
+        "disabled": false
+      },
+      {
+        "parameters": {
+          "useCustomSchema": false,
+          "resource": "row",
+          "operation": "create",
+          "tableId": "Users",
+          "dataToSend": "defineBelow",
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "uuid",
+                "fieldValue": "={{ $json.uuid }}"
+              },
+              {
+                "fieldId": "external_name",
+                "fieldValue": "={{ $json.external_user_id }}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          752,
+          624
+        ],
+        "id": "51addcd8-9b7a-480c-ad45-d69f90df2b22",
+        "name": "Create a row",
+        "credentials": {
+          "supabaseApi": {
+            "id": "h7LAli2C03QNpkjp",
+            "name": "Supabase account"
+          }
+        },
+        "disabled": false
+      },
+      {
+        "id": "f9dd7387-e374-4e63-83b0-e52a7d964c82",
+        "typeVersion": 1.1,
+        "name": "Start",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "position": [
+          320,
+          624
+        ],
+        "parameters": {
+          "inputSource": "passthrough"
+        }
+      }
+    ],
+    "connections": {
+      "HTTP Request2": {
+        "main": [
+          [
+            {
+              "node": "Create a row",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "HTTP Request3": {
+        "main": [
+          [
+            {
+              "node": "HTTP Request4",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create a row": {
+        "main": [
+          [
+            {
+              "node": "HTTP Request3",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Maximilien Borne",
+    "name": null,
+    "description": null,
+    "autosaved": false,
+    "workflowPublishHistory": []
+  }
+}

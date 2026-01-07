@@ -1,0 +1,828 @@
+{
+  "updatedAt": "2025-12-15T14:01:52.413Z",
+  "createdAt": "2025-12-15T13:51:01.796Z",
+  "id": "NSySTjcSvLewMF1T",
+  "name": "ComfyUI - Webhook -> Générer -> Poll -> Télécharger -> Sauver",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "comfyui-generate",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "d9874547-4435-4dcb-80d8-618b050ca53e",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -3296,
+        960
+      ],
+      "webhookId": "510fbf68-89c7-4cd1-9657-35053b2ba8a1"
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "workflowPath",
+              "value": "/data/shared/comfy/workflow_api.json"
+            },
+            {
+              "name": "textNodeId",
+              "value": "6"
+            },
+            {
+              "name": "comfyBaseUrl",
+              "value": "http://host.docker.internal:8188"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "06f9ae38-bdb7-46e4-88a1-29ac868ee079",
+      "name": "Defaults",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        -3072,
+        960
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "25e19151-8211-4963-b8f9-d3f0c80071d9",
+      "name": "Normalize Input",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 2,
+      "position": [
+        -2864,
+        960
+      ]
+    },
+    {
+      "parameters": {
+        "filePath": "={{$node[\"Defaults\"].json.workflowPath}}"
+      },
+      "id": "2aa7d37e-1578-4399-8bd9-895a06e15a65",
+      "name": "Read Binary File (workflow_api.json)",
+      "type": "n8n-nodes-base.readBinaryFile",
+      "typeVersion": 1,
+      "position": [
+        -2624,
+        960
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "a3ca3d80-b72d-4479-bda3-3047102467af",
+      "name": "Build ComfyUI Payload",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 2,
+      "position": [
+        -2384,
+        960
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$node[\"Defaults\"].json.comfyBaseUrl + '/prompt'}}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{$json}}",
+        "options": {
+          "timeout": 300000
+        }
+      },
+      "id": "13295793-20ca-4588-91d9-4fadcb592440",
+      "name": "HTTP - POST /prompt",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        -2144,
+        960
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "number": [
+            {
+              "name": "attempt"
+            },
+            {
+              "name": "maxAttempts",
+              "value": 120
+            }
+          ],
+          "string": [
+            {
+              "name": "prompt_id",
+              "value": "={{$node[\"HTTP - POST /prompt\"].json.prompt_id}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "455ccb56-65b8-42e1-aff0-3ae1315968e9",
+      "name": "Init Poll State",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        -1920,
+        960
+      ]
+    },
+    {
+      "parameters": {
+        "amount": 2,
+        "unit": "seconds"
+      },
+      "id": "3bd0ab75-d7c3-4683-b4dc-31645fa6786a",
+      "name": "Wait 2s",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [
+        -1696,
+        960
+      ],
+      "webhookId": "3aaceba4-4a8d-4ae0-8663-411acb7239dc"
+    },
+    {
+      "parameters": {
+        "url": "={{$node[\"Defaults\"].json.comfyBaseUrl + '/history/' + $node[\"Init Poll State\"].json.prompt_id}}",
+        "options": {
+          "timeout": 300000
+        }
+      },
+      "id": "2b5c4325-47e0-4c7a-882d-ace6b98c94aa",
+      "name": "HTTP - GET /history",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        -1472,
+        960
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "bbf01255-a1ee-4c27-9c3b-9ba3361e05b0",
+      "name": "Check Done + Pick File",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 2,
+      "position": [
+        -1264,
+        960
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{$json.done}}",
+              "operation": "isTrue"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "3481c279-b8cc-4ec2-a78a-d8ca19b9ba52",
+      "name": "IF Done?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -1040,
+        960
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "d50b514b-4083-46be-8478-1249b3ee6375",
+      "name": "Increment Attempt",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 2,
+      "position": [
+        -816,
+        1120
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "number": [
+            {
+              "name": "attempt",
+              "value": "={{$json.attempt}}"
+            },
+            {
+              "name": "maxAttempts",
+              "value": "={{$json.maxAttempts}}"
+            }
+          ],
+          "string": [
+            {
+              "name": "prompt_id",
+              "value": "={{$json.prompt_id}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "4f16ae57-ffb0-4f69-a1e3-87121b6fdafa",
+      "name": "Update Poll State",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        -592,
+        1120
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "931c776e-d304-4f34-860d-1c33a772b93a",
+      "name": "Prepare Download Params",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 2,
+      "position": [
+        -816,
+        880
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{$node[\"Defaults\"].json.comfyBaseUrl + '/view?filename=' + encodeURIComponent($json.filename) + '&type=' + encodeURIComponent($json.type) + '&subfolder=' + encodeURIComponent($json.subfolder)}}",
+        "options": {
+          "timeout": 300000
+        }
+      },
+      "id": "59d244c1-ad06-4254-8b2b-c58d4ed9d35d",
+      "name": "HTTP - GET /view (file)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        -592,
+        880
+      ]
+    },
+    {
+      "parameters": {
+        "fileName": "={{'/data/shared/output/' + $node[\"Prepare Download Params\"].json.filename}}",
+        "options": {}
+      },
+      "id": "1572de83-9f27-41ec-b8c4-a014b0b58e41",
+      "name": "Write Binary File (/data/shared/output)",
+      "type": "n8n-nodes-base.writeBinaryFile",
+      "typeVersion": 1,
+      "position": [
+        -384,
+        880
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "397ea343-b2d0-41d1-aa2f-3efe249b5895",
+      "name": "Respond JSON",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        880
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Defaults",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP - POST /prompt": {
+      "main": [
+        [
+          {
+            "node": "Init Poll State",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Init Poll State": {
+      "main": [
+        [
+          {
+            "node": "Wait 2s",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 2s": {
+      "main": [
+        [
+          {
+            "node": "HTTP - GET /history",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Poll State": {
+      "main": [
+        [
+          {
+            "node": "Wait 2s",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP - GET /view (file)": {
+      "main": [
+        [
+          {
+            "node": "Write Binary File (/data/shared/output)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write Binary File (/data/shared/output)": {
+      "main": [
+        [
+          {
+            "node": "Respond JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "4c181994-6ae4-401d-a75c-b84a695849c6",
+  "activeVersionId": "4c181994-6ae4-401d-a75c-b84a695849c6",
+  "versionCounter": 50,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2025-12-15T13:51:01.796Z",
+      "createdAt": "2025-12-15T13:51:01.796Z",
+      "role": "workflow:owner",
+      "workflowId": "NSySTjcSvLewMF1T",
+      "projectId": "IAHu1pQG7dfjTd27",
+      "project": {
+        "updatedAt": "2025-12-11T22:33:03.220Z",
+        "createdAt": "2025-12-11T22:31:39.471Z",
+        "id": "IAHu1pQG7dfjTd27",
+        "name": "Maximilien Borne <maximilien.borne@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "570e55b9-573e-4a41-afcc-59cd77b6ae62",
+        "projectRelations": [
+          {
+            "updatedAt": "2025-12-11T22:31:39.471Z",
+            "createdAt": "2025-12-11T22:31:39.471Z",
+            "userId": "570e55b9-573e-4a41-afcc-59cd77b6ae62",
+            "projectId": "IAHu1pQG7dfjTd27",
+            "user": {
+              "updatedAt": "2026-01-07T08:35:59.818Z",
+              "createdAt": "2025-12-11T22:31:39.257Z",
+              "id": "570e55b9-573e-4a41-afcc-59cd77b6ae62",
+              "email": "maximilien.borne@gmail.com",
+              "firstName": "Maximilien",
+              "lastName": "Borne",
+              "personalizationAnswers": null,
+              "settings": {
+                "userActivated": true,
+                "easyAIWorkflowOnboarded": true,
+                "firstSuccessfulWorkflowId": "NSySTjcSvLewMF1T",
+                "userActivatedAt": 1765806789336
+              },
+              "disabled": false,
+              "mfaEnabled": false,
+              "lastActiveAt": "2026-01-07",
+              "isPending": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": {
+    "updatedAt": "2025-12-15T14:01:37.574Z",
+    "createdAt": "2025-12-15T14:01:37.574Z",
+    "versionId": "4c181994-6ae4-401d-a75c-b84a695849c6",
+    "workflowId": "NSySTjcSvLewMF1T",
+    "nodes": [
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "comfyui-generate",
+          "responseMode": "lastNode",
+          "options": {}
+        },
+        "id": "d9874547-4435-4dcb-80d8-618b050ca53e",
+        "name": "Webhook",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2,
+        "position": [
+          -3296,
+          960
+        ],
+        "webhookId": "510fbf68-89c7-4cd1-9657-35053b2ba8a1"
+      },
+      {
+        "parameters": {
+          "values": {
+            "string": [
+              {
+                "name": "workflowPath",
+                "value": "/data/shared/comfy/workflow_api.json"
+              },
+              {
+                "name": "textNodeId",
+                "value": "6"
+              },
+              {
+                "name": "comfyBaseUrl",
+                "value": "http://host.docker.internal:8188"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "06f9ae38-bdb7-46e4-88a1-29ac868ee079",
+        "name": "Defaults",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 2,
+        "position": [
+          -3072,
+          960
+        ]
+      },
+      {
+        "parameters": {},
+        "id": "25e19151-8211-4963-b8f9-d3f0c80071d9",
+        "name": "Normalize Input",
+        "type": "n8n-nodes-base.function",
+        "typeVersion": 2,
+        "position": [
+          -2864,
+          960
+        ]
+      },
+      {
+        "parameters": {
+          "filePath": "={{$node[\"Defaults\"].json.workflowPath}}"
+        },
+        "id": "2aa7d37e-1578-4399-8bd9-895a06e15a65",
+        "name": "Read Binary File (workflow_api.json)",
+        "type": "n8n-nodes-base.readBinaryFile",
+        "typeVersion": 1,
+        "position": [
+          -2624,
+          960
+        ]
+      },
+      {
+        "parameters": {},
+        "id": "a3ca3d80-b72d-4479-bda3-3047102467af",
+        "name": "Build ComfyUI Payload",
+        "type": "n8n-nodes-base.function",
+        "typeVersion": 2,
+        "position": [
+          -2384,
+          960
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "={{$node[\"Defaults\"].json.comfyBaseUrl + '/prompt'}}",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{$json}}",
+          "options": {
+            "timeout": 300000
+          }
+        },
+        "id": "13295793-20ca-4588-91d9-4fadcb592440",
+        "name": "HTTP - POST /prompt",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4,
+        "position": [
+          -2144,
+          960
+        ]
+      },
+      {
+        "parameters": {
+          "values": {
+            "number": [
+              {
+                "name": "attempt"
+              },
+              {
+                "name": "maxAttempts",
+                "value": 120
+              }
+            ],
+            "string": [
+              {
+                "name": "prompt_id",
+                "value": "={{$node[\"HTTP - POST /prompt\"].json.prompt_id}}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "455ccb56-65b8-42e1-aff0-3ae1315968e9",
+        "name": "Init Poll State",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 2,
+        "position": [
+          -1920,
+          960
+        ]
+      },
+      {
+        "parameters": {
+          "amount": 2,
+          "unit": "seconds"
+        },
+        "id": "3bd0ab75-d7c3-4683-b4dc-31645fa6786a",
+        "name": "Wait 2s",
+        "type": "n8n-nodes-base.wait",
+        "typeVersion": 1,
+        "position": [
+          -1696,
+          960
+        ],
+        "webhookId": "3aaceba4-4a8d-4ae0-8663-411acb7239dc"
+      },
+      {
+        "parameters": {
+          "url": "={{$node[\"Defaults\"].json.comfyBaseUrl + '/history/' + $node[\"Init Poll State\"].json.prompt_id}}",
+          "options": {
+            "timeout": 300000
+          }
+        },
+        "id": "2b5c4325-47e0-4c7a-882d-ace6b98c94aa",
+        "name": "HTTP - GET /history",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4,
+        "position": [
+          -1472,
+          960
+        ]
+      },
+      {
+        "parameters": {},
+        "id": "bbf01255-a1ee-4c27-9c3b-9ba3361e05b0",
+        "name": "Check Done + Pick File",
+        "type": "n8n-nodes-base.function",
+        "typeVersion": 2,
+        "position": [
+          -1264,
+          960
+        ]
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "boolean": [
+              {
+                "value1": "={{$json.done}}",
+                "operation": "isTrue"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "3481c279-b8cc-4ec2-a78a-d8ca19b9ba52",
+        "name": "IF Done?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2,
+        "position": [
+          -1040,
+          960
+        ]
+      },
+      {
+        "parameters": {},
+        "id": "d50b514b-4083-46be-8478-1249b3ee6375",
+        "name": "Increment Attempt",
+        "type": "n8n-nodes-base.function",
+        "typeVersion": 2,
+        "position": [
+          -816,
+          1120
+        ]
+      },
+      {
+        "parameters": {
+          "values": {
+            "number": [
+              {
+                "name": "attempt",
+                "value": "={{$json.attempt}}"
+              },
+              {
+                "name": "maxAttempts",
+                "value": "={{$json.maxAttempts}}"
+              }
+            ],
+            "string": [
+              {
+                "name": "prompt_id",
+                "value": "={{$json.prompt_id}}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "4f16ae57-ffb0-4f69-a1e3-87121b6fdafa",
+        "name": "Update Poll State",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 2,
+        "position": [
+          -592,
+          1120
+        ]
+      },
+      {
+        "parameters": {},
+        "id": "931c776e-d304-4f34-860d-1c33a772b93a",
+        "name": "Prepare Download Params",
+        "type": "n8n-nodes-base.function",
+        "typeVersion": 2,
+        "position": [
+          -816,
+          880
+        ]
+      },
+      {
+        "parameters": {
+          "url": "={{$node[\"Defaults\"].json.comfyBaseUrl + '/view?filename=' + encodeURIComponent($json.filename) + '&type=' + encodeURIComponent($json.type) + '&subfolder=' + encodeURIComponent($json.subfolder)}}",
+          "options": {
+            "timeout": 300000
+          }
+        },
+        "id": "59d244c1-ad06-4254-8b2b-c58d4ed9d35d",
+        "name": "HTTP - GET /view (file)",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4,
+        "position": [
+          -592,
+          880
+        ]
+      },
+      {
+        "parameters": {
+          "fileName": "={{'/data/shared/output/' + $node[\"Prepare Download Params\"].json.filename}}",
+          "options": {}
+        },
+        "id": "1572de83-9f27-41ec-b8c4-a014b0b58e41",
+        "name": "Write Binary File (/data/shared/output)",
+        "type": "n8n-nodes-base.writeBinaryFile",
+        "typeVersion": 1,
+        "position": [
+          -384,
+          880
+        ]
+      },
+      {
+        "parameters": {
+          "options": {}
+        },
+        "id": "397ea343-b2d0-41d1-aa2f-3efe249b5895",
+        "name": "Respond JSON",
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1,
+        "position": [
+          -160,
+          880
+        ]
+      }
+    ],
+    "connections": {
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "Defaults",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "HTTP - POST /prompt": {
+        "main": [
+          [
+            {
+              "node": "Init Poll State",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Init Poll State": {
+        "main": [
+          [
+            {
+              "node": "Wait 2s",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Wait 2s": {
+        "main": [
+          [
+            {
+              "node": "HTTP - GET /history",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Update Poll State": {
+        "main": [
+          [
+            {
+              "node": "Wait 2s",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "HTTP - GET /view (file)": {
+        "main": [
+          [
+            {
+              "node": "Write Binary File (/data/shared/output)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Write Binary File (/data/shared/output)": {
+        "main": [
+          [
+            {
+              "node": "Respond JSON",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Maximilien Borne",
+    "name": null,
+    "description": null,
+    "autosaved": false,
+    "workflowPublishHistory": [
+      {
+        "createdAt": "2025-12-15T14:01:52.425Z",
+        "id": 5,
+        "workflowId": "NSySTjcSvLewMF1T",
+        "versionId": "4c181994-6ae4-401d-a75c-b84a695849c6",
+        "event": "activated",
+        "userId": "570e55b9-573e-4a41-afcc-59cd77b6ae62"
+      }
+    ]
+  }
+}

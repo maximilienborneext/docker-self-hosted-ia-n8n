@@ -1,0 +1,761 @@
+{
+  "updatedAt": "2025-12-17T09:02:59.300Z",
+  "createdAt": "2025-12-16T14:22:08.707Z",
+  "id": "J9YbrYbTjLquDBdt",
+  "name": "BanqueFlow",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.bridgeapi.io/v3/aggregation/users",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n  \"Bridge-Version\": \"2025-01-15\",\n  \"Client-Id\": \"sandbox_id_08271d6127534385918650e90112774d\",\n  \"Client-Secret\": \"sandbox_secret_kPUJ07NSFUHgRnkK7o1VDyQgGZBTgGKGAAdcolPeXC7eymp8kclQBgb0n1JmJydt\",\n  \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"external_user_id\": \"test15\" }",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -992,
+        320
+      ],
+      "id": "08f19508-0f36-4a75-bfa8-06ee054960c1",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.bridgeapi.io/v3/aggregation/authorization/token",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n  \"Bridge-Version\": \"2025-01-15\",\n  \"Client-Id\": \"sandbox_id_08271d6127534385918650e90112774d\",\n  \"Client-Secret\":\"sandbox_secret_kPUJ07NSFUHgRnkK7o1VDyQgGZBTgGKGAAdcolPeXC7eymp8kclQBgb0n1JmJydt\",\n  \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"user_uuid\": \"{{ $json.uuid }}\" }",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -544,
+        320
+      ],
+      "id": "7c121ee4-e8bf-4be9-b5af-aec299d2b8e1",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.bridgeapi.io/v3/aggregation/connect-sessions",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={\n  \"Authorization\": \"Bearer {{ $json.access_token }}\",\n  \"Bridge-Version\": \"2025-01-15\",\n  \"Client-Id\": \"sandbox_id_08271d6127534385918650e90112774d\",\n  \"Client-Secret\": \"sandbox_secret_kPUJ07NSFUHgRnkK7o1VDyQgGZBTgGKGAAdcolPeXC7eymp8kclQBgb0n1JmJydt\",\n  \"Content-Type\": \"application/json\"\n} ",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"user_email\": \"user@test.com\",\n  \"callback_url\": \"http://nonconsorting-cathy-royally.ngrok-free.dev/webhook-test/bridge-callback\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -336,
+        320
+      ],
+      "id": "a79629cc-ecb6-43fc-bbab-de027bcab485",
+      "name": "HTTP Request4"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1696,
+        432
+      ],
+      "id": "f267f395-47ba-4ab5-9ba2-38beff455398",
+      "name": "When Executed by Another Workflow",
+      "alwaysOutputData": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "tableId": "Users",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "uuid",
+              "fieldValue": "={{ $json.uuid }}"
+            },
+            {
+              "fieldId": "external_name",
+              "fieldValue": "={{ $json.external_user_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -768,
+        320
+      ],
+      "id": "dddf7f50-55bb-4419-a24d-e0203942bb90",
+      "name": "Create a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "h7LAli2C03QNpkjp",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "path": "bridge-callback",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1152,
+        768
+      ],
+      "id": "e3c3b395-500b-4c7f-ae47-c54d39cbb562",
+      "name": "Webhook",
+      "webhookId": "feaac5eb-32bb-4d2d-9c44-6b0b6350adea"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.bridgeapi.io/v3/aggregation/authorization/token",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n  \"Bridge-Version\": \"2025-01-15\",\n  \"Client-Id\": \"sandbox_id_08271d6127534385918650e90112774d\",\n  \"Client-Secret\": \"sandbox_secret_kPUJ07NSFUHgRnkK7o1VDyQgGZBTgGKGAAdcolPeXC7eymp8kclQBgb0n1JmJydt\",\n  \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"user_uuid\": \"{{$json.query.user_uuid}}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -944,
+        768
+      ],
+      "id": "daff0522-6539-4b2f-af2d-28bcbf19f162",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "url": "https://api.bridgeapi.io/v3/aggregation/accounts",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={\n  \"Authorization\": \"Bearer {{ $json.access_token }} \",\n  \"Bridge-Version\": \"2025-01-15\",\n  \"Client-Id\": \"sandbox_id_08271d6127534385918650e90112774d\",\n  \"Client-Secret\": \"sandbox_secret_kPUJ07NSFUHgRnkK7o1VDyQgGZBTgGKGAAdcolPeXC7eymp8kclQBgb0n1JmJydt\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -736,
+        768
+      ],
+      "id": "1ff8703d-56cf-48b6-8c86-e712222a6a1e",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.bridgeapi.io/v3/aggregation/transactions?account_uuid={{$json.uuid}}",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={\n  \"Authorization\": \"Bearer {{ $json.access_token }} \",\n  \"Bridge-Version\": \"2025-01-15\",\n  \"Client-Id\": \"sandbox_id_08271d6127534385918650e90112774d\",\n  \"Client-Secret\": \"sandbox_secret_kPUJ07NSFUHgRnkK7o1VDyQgGZBTgGKGAAdcolPeXC7eymp8kclQBgb0n1JmJydt\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1696,
+        672
+      ],
+      "id": "34d5034f-d7f5-466d-bdbc-88002a9955e3",
+      "name": "HTTP Request5"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "Users",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "external_name",
+              "keyValue": "test15"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -1184,
+        432
+      ],
+      "id": "044bee6e-499b-4f37-945a-7f0622bca8c5",
+      "name": "Get a row",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "h7LAli2C03QNpkjp",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        192,
+        1248
+      ],
+      "typeVersion": 1,
+      "id": "abbe31ae-82cd-48b5-831e-9bbba3ff8297",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "Execution manuellement pour chaque étape et récupération de l'URL pour la synchro bancaire\n"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2336,
+        144
+      ],
+      "typeVersion": 1,
+      "id": "51ad8bb0-aed5-4096-af79-341fb66dce4c",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1376,
+        432
+      ],
+      "id": "1483ba2e-235f-4f55-b6da-40354fb5be65",
+      "name": "When clicking ‘Execute workflow’",
+      "disabled": true
+    }
+  ],
+  "connections": {
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "Create a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request3": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [],
+        []
+      ]
+    },
+    "Create a row": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        []
+      ]
+    },
+    "HTTP Request4": {
+      "main": [
+        []
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a row": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "e2e86ff1-79cd-4a4b-a194-471fabe90829",
+  "activeVersionId": "e2e86ff1-79cd-4a4b-a194-471fabe90829",
+  "versionCounter": 61,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2025-12-16T14:22:08.707Z",
+      "createdAt": "2025-12-16T14:22:08.707Z",
+      "role": "workflow:owner",
+      "workflowId": "J9YbrYbTjLquDBdt",
+      "projectId": "IAHu1pQG7dfjTd27",
+      "project": {
+        "updatedAt": "2025-12-11T22:33:03.220Z",
+        "createdAt": "2025-12-11T22:31:39.471Z",
+        "id": "IAHu1pQG7dfjTd27",
+        "name": "Maximilien Borne <maximilien.borne@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "570e55b9-573e-4a41-afcc-59cd77b6ae62",
+        "projectRelations": [
+          {
+            "updatedAt": "2025-12-11T22:31:39.471Z",
+            "createdAt": "2025-12-11T22:31:39.471Z",
+            "userId": "570e55b9-573e-4a41-afcc-59cd77b6ae62",
+            "projectId": "IAHu1pQG7dfjTd27",
+            "user": {
+              "updatedAt": "2026-01-07T08:35:59.818Z",
+              "createdAt": "2025-12-11T22:31:39.257Z",
+              "id": "570e55b9-573e-4a41-afcc-59cd77b6ae62",
+              "email": "maximilien.borne@gmail.com",
+              "firstName": "Maximilien",
+              "lastName": "Borne",
+              "personalizationAnswers": null,
+              "settings": {
+                "userActivated": true,
+                "easyAIWorkflowOnboarded": true,
+                "firstSuccessfulWorkflowId": "NSySTjcSvLewMF1T",
+                "userActivatedAt": 1765806789336
+              },
+              "disabled": false,
+              "mfaEnabled": false,
+              "lastActiveAt": "2026-01-07",
+              "isPending": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": {
+    "updatedAt": "2025-12-18T12:15:28.906Z",
+    "createdAt": "2025-12-18T12:15:28.906Z",
+    "versionId": "e2e86ff1-79cd-4a4b-a194-471fabe90829",
+    "workflowId": "J9YbrYbTjLquDBdt",
+    "nodes": [
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.bridgeapi.io/v3/aggregation/users",
+          "sendHeaders": true,
+          "specifyHeaders": "json",
+          "jsonHeaders": "{\n  \"Bridge-Version\": \"2025-01-15\",\n  \"Client-Id\": \"sandbox_id_08271d6127534385918650e90112774d\",\n  \"Client-Secret\": \"sandbox_secret_kPUJ07NSFUHgRnkK7o1VDyQgGZBTgGKGAAdcolPeXC7eymp8kclQBgb0n1JmJydt\",\n  \"Content-Type\": \"application/json\"\n}",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={ \"external_user_id\": \"test15\" }",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.3,
+        "position": [
+          -992,
+          320
+        ],
+        "id": "08f19508-0f36-4a75-bfa8-06ee054960c1",
+        "name": "HTTP Request2"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.bridgeapi.io/v3/aggregation/authorization/token",
+          "sendHeaders": true,
+          "specifyHeaders": "json",
+          "jsonHeaders": "{\n  \"Bridge-Version\": \"2025-01-15\",\n  \"Client-Id\": \"sandbox_id_08271d6127534385918650e90112774d\",\n  \"Client-Secret\":\"sandbox_secret_kPUJ07NSFUHgRnkK7o1VDyQgGZBTgGKGAAdcolPeXC7eymp8kclQBgb0n1JmJydt\",\n  \"Content-Type\": \"application/json\"\n}",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={ \"user_uuid\": \"{{ $json.uuid }}\" }",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.3,
+        "position": [
+          -544,
+          320
+        ],
+        "id": "7c121ee4-e8bf-4be9-b5af-aec299d2b8e1",
+        "name": "HTTP Request3"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.bridgeapi.io/v3/aggregation/connect-sessions",
+          "sendHeaders": true,
+          "specifyHeaders": "json",
+          "jsonHeaders": "={\n  \"Authorization\": \"Bearer {{ $json.access_token }}\",\n  \"Bridge-Version\": \"2025-01-15\",\n  \"Client-Id\": \"sandbox_id_08271d6127534385918650e90112774d\",\n  \"Client-Secret\": \"sandbox_secret_kPUJ07NSFUHgRnkK7o1VDyQgGZBTgGKGAAdcolPeXC7eymp8kclQBgb0n1JmJydt\",\n  \"Content-Type\": \"application/json\"\n} ",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "{\n  \"user_email\": \"user@test.com\",\n  \"callback_url\": \"http://nonconsorting-cathy-royally.ngrok-free.dev/webhook-test/bridge-callback\"\n}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.3,
+        "position": [
+          -336,
+          320
+        ],
+        "id": "a79629cc-ecb6-43fc-bbab-de027bcab485",
+        "name": "HTTP Request4"
+      },
+      {
+        "parameters": {
+          "inputSource": "passthrough"
+        },
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          -1696,
+          432
+        ],
+        "id": "f267f395-47ba-4ab5-9ba2-38beff455398",
+        "name": "When Executed by Another Workflow",
+        "alwaysOutputData": true,
+        "onError": "continueErrorOutput"
+      },
+      {
+        "parameters": {
+          "tableId": "Users",
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "uuid",
+                "fieldValue": "={{ $json.uuid }}"
+              },
+              {
+                "fieldId": "external_name",
+                "fieldValue": "={{ $json.external_user_id }}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          -768,
+          320
+        ],
+        "id": "dddf7f50-55bb-4419-a24d-e0203942bb90",
+        "name": "Create a row",
+        "credentials": {
+          "supabaseApi": {
+            "id": "h7LAli2C03QNpkjp",
+            "name": "Supabase account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "path": "bridge-callback",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          -1152,
+          768
+        ],
+        "id": "e3c3b395-500b-4c7f-ae47-c54d39cbb562",
+        "name": "Webhook",
+        "webhookId": "feaac5eb-32bb-4d2d-9c44-6b0b6350adea"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.bridgeapi.io/v3/aggregation/authorization/token",
+          "sendHeaders": true,
+          "specifyHeaders": "json",
+          "jsonHeaders": "{\n  \"Bridge-Version\": \"2025-01-15\",\n  \"Client-Id\": \"sandbox_id_08271d6127534385918650e90112774d\",\n  \"Client-Secret\": \"sandbox_secret_kPUJ07NSFUHgRnkK7o1VDyQgGZBTgGKGAAdcolPeXC7eymp8kclQBgb0n1JmJydt\",\n  \"Content-Type\": \"application/json\"\n}",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={\n  \"user_uuid\": \"{{$json.query.user_uuid}}\"\n}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.3,
+        "position": [
+          -944,
+          768
+        ],
+        "id": "daff0522-6539-4b2f-af2d-28bcbf19f162",
+        "name": "HTTP Request"
+      },
+      {
+        "parameters": {
+          "url": "https://api.bridgeapi.io/v3/aggregation/accounts",
+          "sendHeaders": true,
+          "specifyHeaders": "json",
+          "jsonHeaders": "={\n  \"Authorization\": \"Bearer {{ $json.access_token }} \",\n  \"Bridge-Version\": \"2025-01-15\",\n  \"Client-Id\": \"sandbox_id_08271d6127534385918650e90112774d\",\n  \"Client-Secret\": \"sandbox_secret_kPUJ07NSFUHgRnkK7o1VDyQgGZBTgGKGAAdcolPeXC7eymp8kclQBgb0n1JmJydt\"\n}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.3,
+        "position": [
+          -736,
+          768
+        ],
+        "id": "1ff8703d-56cf-48b6-8c86-e712222a6a1e",
+        "name": "HTTP Request1"
+      },
+      {
+        "parameters": {
+          "url": "=https://api.bridgeapi.io/v3/aggregation/transactions?account_uuid={{$json.uuid}}",
+          "sendHeaders": true,
+          "specifyHeaders": "json",
+          "jsonHeaders": "={\n  \"Authorization\": \"Bearer {{ $json.access_token }} \",\n  \"Bridge-Version\": \"2025-01-15\",\n  \"Client-Id\": \"sandbox_id_08271d6127534385918650e90112774d\",\n  \"Client-Secret\": \"sandbox_secret_kPUJ07NSFUHgRnkK7o1VDyQgGZBTgGKGAAdcolPeXC7eymp8kclQBgb0n1JmJydt\"\n}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.3,
+        "position": [
+          -1696,
+          672
+        ],
+        "id": "34d5034f-d7f5-466d-bdbc-88002a9955e3",
+        "name": "HTTP Request5"
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "tableId": "Users",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "external_name",
+                "keyValue": "test15"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          -1184,
+          432
+        ],
+        "id": "044bee6e-499b-4f37-945a-7f0622bca8c5",
+        "name": "Get a row",
+        "alwaysOutputData": true,
+        "credentials": {
+          "supabaseApi": {
+            "id": "h7LAli2C03QNpkjp",
+            "name": "Supabase account"
+          }
+        }
+      },
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          192,
+          1248
+        ],
+        "typeVersion": 1,
+        "id": "abbe31ae-82cd-48b5-831e-9bbba3ff8297",
+        "name": "Sticky Note"
+      },
+      {
+        "parameters": {
+          "content": "Execution manuellement pour chaque étape et récupération de l'URL pour la synchro bancaire\n"
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          -2336,
+          144
+        ],
+        "typeVersion": 1,
+        "id": "51ad8bb0-aed5-4096-af79-341fb66dce4c",
+        "name": "Sticky Note1"
+      },
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.manualTrigger",
+        "typeVersion": 1,
+        "position": [
+          -1376,
+          432
+        ],
+        "id": "1483ba2e-235f-4f55-b6da-40354fb5be65",
+        "name": "When clicking ‘Execute workflow’",
+        "disabled": true
+      }
+    ],
+    "connections": {
+      "HTTP Request2": {
+        "main": [
+          [
+            {
+              "node": "Create a row",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "HTTP Request3": {
+        "main": [
+          [
+            {
+              "node": "HTTP Request4",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "When Executed by Another Workflow": {
+        "main": [
+          [],
+          []
+        ]
+      },
+      "Create a row": {
+        "main": [
+          [
+            {
+              "node": "HTTP Request3",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "HTTP Request",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "HTTP Request": {
+        "main": [
+          [
+            {
+              "node": "HTTP Request1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "HTTP Request1": {
+        "main": [
+          []
+        ]
+      },
+      "HTTP Request4": {
+        "main": [
+          []
+        ]
+      },
+      "When clicking ‘Execute workflow’": {
+        "main": [
+          [
+            {
+              "node": "Get a row",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get a row": {
+        "main": [
+          [
+            {
+              "node": "HTTP Request2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "system migration",
+    "name": null,
+    "description": null,
+    "autosaved": false,
+    "workflowPublishHistory": []
+  }
+}

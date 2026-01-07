@@ -1,0 +1,303 @@
+{
+  "updatedAt": "2025-12-27T12:46:39.235Z",
+  "createdAt": "2025-12-23T14:54:38.539Z",
+  "id": "MLXJacwoL1xIM4wx",
+  "name": "Projet001_AgentSubWorkflow",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "data1"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "309c1102-7ebe-4e4d-bae9-4b6ef64c8d4b",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"sub_workflow_value\": \"CACA\"\n}\n",
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "c6fba6b6-e2a9-4122-85e2-c4bec3086c02",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "Users"
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        416,
+        0
+      ],
+      "id": "824ed676-9624-4bc1-bdba-7904a81f573c",
+      "name": "Get many rows",
+      "credentials": {
+        "supabaseApi": {
+          "id": "h7LAli2C03QNpkjp",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"data1\": {{ $('Edit Fields').item.json.data1 }},\n  \"sub_workflow_value\": {{ $('Edit Fields').item.json.sub_workflow_value }},\n  \"external_name\": {{ $json.external_name }},\n  \"id_telegram\": {{ $json.id_telegram }}\n}\n\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        624,
+        0
+      ],
+      "id": "4e1b1d8b-cc9c-41ad-a74e-0684ef7561d7",
+      "name": "Edit Fields1"
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Get many rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many rows": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "ebfd072d-56fe-4953-8ab8-d1827f1eeae7",
+  "activeVersionId": "ebfd072d-56fe-4953-8ab8-d1827f1eeae7",
+  "versionCounter": 47,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-12-23T14:54:38.539Z",
+      "createdAt": "2025-12-23T14:54:38.539Z",
+      "role": "workflow:owner",
+      "workflowId": "MLXJacwoL1xIM4wx",
+      "projectId": "IAHu1pQG7dfjTd27",
+      "project": {
+        "updatedAt": "2025-12-11T22:33:03.220Z",
+        "createdAt": "2025-12-11T22:31:39.471Z",
+        "id": "IAHu1pQG7dfjTd27",
+        "name": "Maximilien Borne <maximilien.borne@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "570e55b9-573e-4a41-afcc-59cd77b6ae62",
+        "projectRelations": [
+          {
+            "updatedAt": "2025-12-11T22:31:39.471Z",
+            "createdAt": "2025-12-11T22:31:39.471Z",
+            "userId": "570e55b9-573e-4a41-afcc-59cd77b6ae62",
+            "projectId": "IAHu1pQG7dfjTd27",
+            "user": {
+              "updatedAt": "2026-01-07T08:35:59.818Z",
+              "createdAt": "2025-12-11T22:31:39.257Z",
+              "id": "570e55b9-573e-4a41-afcc-59cd77b6ae62",
+              "email": "maximilien.borne@gmail.com",
+              "firstName": "Maximilien",
+              "lastName": "Borne",
+              "personalizationAnswers": null,
+              "settings": {
+                "userActivated": true,
+                "easyAIWorkflowOnboarded": true,
+                "firstSuccessfulWorkflowId": "NSySTjcSvLewMF1T",
+                "userActivatedAt": 1765806789336
+              },
+              "disabled": false,
+              "mfaEnabled": false,
+              "lastActiveAt": "2026-01-07",
+              "isPending": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": {
+    "updatedAt": "2025-12-27T10:13:19.977Z",
+    "createdAt": "2025-12-27T10:12:54.581Z",
+    "versionId": "ebfd072d-56fe-4953-8ab8-d1827f1eeae7",
+    "workflowId": "MLXJacwoL1xIM4wx",
+    "nodes": [
+      {
+        "parameters": {
+          "workflowInputs": {
+            "values": [
+              {
+                "name": "data1"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          0,
+          0
+        ],
+        "id": "309c1102-7ebe-4e4d-bae9-4b6ef64c8d4b",
+        "name": "When Executed by Another Workflow"
+      },
+      {
+        "parameters": {
+          "mode": "raw",
+          "jsonOutput": "{\n  \"sub_workflow_value\": \"CACA\"\n}\n",
+          "includeOtherFields": true,
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          208,
+          0
+        ],
+        "id": "c6fba6b6-e2a9-4122-85e2-c4bec3086c02",
+        "name": "Edit Fields"
+      },
+      {
+        "parameters": {
+          "operation": "getAll",
+          "tableId": "Users"
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          416,
+          0
+        ],
+        "id": "824ed676-9624-4bc1-bdba-7904a81f573c",
+        "name": "Get many rows",
+        "credentials": {
+          "supabaseApi": {
+            "id": "h7LAli2C03QNpkjp",
+            "name": "Supabase account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "mode": "raw",
+          "jsonOutput": "={\n  \"data1\": {{ $('Edit Fields').item.json.data1 }},\n  \"sub_workflow_value\": {{ $('Edit Fields').item.json.sub_workflow_value }},\n  \"external_name\": {{ $json.external_name }},\n  \"id_telegram\": {{ $json.id_telegram }}\n}\n\n",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          624,
+          0
+        ],
+        "id": "4e1b1d8b-cc9c-41ad-a74e-0684ef7561d7",
+        "name": "Edit Fields1"
+      }
+    ],
+    "connections": {
+      "When Executed by Another Workflow": {
+        "main": [
+          [
+            {
+              "node": "Edit Fields",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Edit Fields": {
+        "main": [
+          [
+            {
+              "node": "Get many rows",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get many rows": {
+        "main": [
+          [
+            {
+              "node": "Edit Fields1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Maximilien Borne",
+    "name": "Version ebfd072d",
+    "description": "",
+    "autosaved": false,
+    "workflowPublishHistory": [
+      {
+        "createdAt": "2025-12-27T10:13:19.976Z",
+        "id": 39,
+        "workflowId": "MLXJacwoL1xIM4wx",
+        "versionId": "ebfd072d-56fe-4953-8ab8-d1827f1eeae7",
+        "event": "activated",
+        "userId": "570e55b9-573e-4a41-afcc-59cd77b6ae62"
+      }
+    ]
+  }
+}
