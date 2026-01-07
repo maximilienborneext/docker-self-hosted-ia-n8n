@@ -92,7 +92,30 @@ COMMIT_CHANGES=false \
 
 ## 🤖 Automatisation
 
-### Option 1 : Cron Job (recommandé)
+### ✅ Option recommandée : Cron Job (CONFIGURÉ)
+
+**Le cron job est déjà configuré et actif !**
+
+Export automatique toutes les 6 heures (00:00, 06:00, 12:00, 18:00)
+
+**Voir la configuration :**
+```bash
+crontab -l
+```
+
+**Voir les logs :**
+```bash
+tail -f /tmp/n8n-export.log
+```
+
+**Modifier la fréquence :**
+```bash
+crontab -e
+```
+
+---
+
+### Option 1 : Cron Job (déjà configuré)
 
 **Exécuter l'export toutes les heures :**
 
@@ -122,40 +145,7 @@ crontab -l
 
 ---
 
-### Option 2 : Workflow N8N avec webhook
-
-Un workflow N8N d'exemple est fourni dans `n8n/workflows/auto-export-workflows.json`.
-
-**Fonctionnalités :**
-- ✅ **Cron automatique** : s'exécute toutes les 6 heures
-- ✅ **Trigger manuel** : via webhook POST `/export-workflows`
-- ✅ **Notifications** : retour de statut (succès/erreur)
-
-**Importer le workflow :**
-1. Ouvrez N8N : http://localhost:5678
-2. Cliquez sur **Import from File**
-3. Sélectionnez `n8n/workflows/auto-export-workflows.json`
-4. Activez le workflow
-
-**⚠️ Note importante :**
-Ce workflow nécessite que le script soit accessible depuis le conteneur N8N. Il faut monter le script dans le conteneur :
-
-```yaml
-# Dans docker-compose.yml
-services:
-  n8n:
-    volumes:
-      - ./scripts:/data/scripts:ro
-```
-
-**Tester le webhook manuellement :**
-```bash
-curl -X POST http://localhost:5678/webhook/export-workflows
-```
-
----
-
-### Option 3 : Launchd (macOS - démarrage automatique)
+### Option 2 : Launchd (macOS - démarrage automatique)
 
 **Créer un agent launchd qui exécute l'export toutes les heures :**
 
@@ -215,7 +205,7 @@ tail -f /tmp/n8n-export.log
 
 ---
 
-### Option 4 : Systemd (Linux)
+### Option 3 : Systemd (Linux)
 
 **Créer un service systemd avec timer :**
 
