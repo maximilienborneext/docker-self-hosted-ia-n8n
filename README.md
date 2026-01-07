@@ -11,7 +11,7 @@ quickly get started with building self-hosted AI workflows.
 > [!TIP]
 > [Read the announcement](https://blog.n8n.io/self-hosted-ai/)
 
-### What’s included
+### What's included
 
 ✅ [**Self-hosted n8n**](https://n8n.io/) - Low-code platform with over 400
 integrations and advanced AI components
@@ -24,6 +24,23 @@ store with an comprehensive API
 
 ✅ [**PostgreSQL**](https://www.postgresql.org/) -  Workhorse of the Data
 Engineering world, handles large amounts of data safely.
+
+✅ **NGINX Proxy** - Centralized API gateway with full observability
+
+✅ **Grafana + Loki** - Monitoring and log visualization
+
+---
+
+## Documentation
+
+| Guide | Description |
+|-------|-------------|
+| [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md) | Deploiement complet sur serveur (VPS, Hostinger, etc.) |
+| [OLLAMA_GUIDE.md](./OLLAMA_GUIDE.md) | Configuration et utilisation d'Ollama avec N8N |
+| [NGINX_PROXY_SETUP.md](./NGINX_PROXY_SETUP.md) | Configuration du proxy NGINX et observabilité |
+| [N8N_WORKFLOW_EXPORT.md](./N8N_WORKFLOW_EXPORT.md) | Export automatique des workflows vers Git |
+
+---
 
 ### What you can build
 
