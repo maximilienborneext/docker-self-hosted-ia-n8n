@@ -357,7 +357,7 @@
   "pinData": {},
   "versionId": "e2e86ff1-79cd-4a4b-a194-471fabe90829",
   "activeVersionId": "e2e86ff1-79cd-4a4b-a194-471fabe90829",
-  "versionCounter": 61,
+  "versionCounter": 63,
   "triggerCount": 1,
   "shared": [
     {
@@ -382,7 +382,7 @@
             "userId": "570e55b9-573e-4a41-afcc-59cd77b6ae62",
             "projectId": "IAHu1pQG7dfjTd27",
             "user": {
-              "updatedAt": "2026-01-07T08:35:59.818Z",
+              "updatedAt": "2026-01-07T08:52:56.782Z",
               "createdAt": "2025-12-11T22:31:39.257Z",
               "id": "570e55b9-573e-4a41-afcc-59cd77b6ae62",
               "email": "maximilien.borne@gmail.com",
