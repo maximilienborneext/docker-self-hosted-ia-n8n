@@ -40,7 +40,7 @@
     },
     {
       "parameters": {
-        "command": "cd /data && /bin/bash /data/scripts/export-n8n-workflows.sh"
+        "command": "cd /data && . /data/.env && sh /data/scripts/export-n8n-workflows-docker.sh"
       },
       "name": "Execute Export Script",
       "type": "n8n-nodes-base.executeCommand",

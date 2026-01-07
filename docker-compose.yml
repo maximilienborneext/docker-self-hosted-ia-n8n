@@ -81,6 +81,11 @@ services:
       - n8n_storage:/home/node/.n8n
       - ./n8n/demo-data:/demo-data
       - ./shared:/data/shared
+      # Volumes for workflow auto-export
+      - ./scripts:/data/scripts:ro           # Script d'export (read-only)
+      - ./n8n/workflows:/data/n8n/workflows  # Dossier d'export des workflows
+      - ./.git:/data/.git                    # Accès Git pour commit automatique
+      - ./.env:/data/.env:ro                 # Variables d'environnement (read-only)
     depends_on:
       postgres:
         condition: service_healthy
