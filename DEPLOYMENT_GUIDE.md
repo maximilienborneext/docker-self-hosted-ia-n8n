@@ -141,6 +141,10 @@ SUPABASE_API_KEY=votre-clé
 # Google Analytics (optionnel)
 GOOGLE_ANALYTICS_MEASUREMENT_ID=G-XXXXXXXXX
 GOOGLE_ANALYTICS_API_SECRET=votre-secret
+
+# Export des workflows (optionnel)
+ENABLE_HISTORY=true        # Activer l'historisation
+HISTORY_RETENTION=10       # Nombre de snapshots à conserver
 ```
 
 **Générer des clés sécurisées :**
@@ -442,7 +446,8 @@ ERROR: RAM insuffisante: 8GB détectés
 - [ ] Services démarrés (`docker-compose up -d`)
 - [ ] N8N accessible, compte admin créé
 - [ ] Clé API N8N générée et ajoutée dans `.env`
-- [ ] Cron job configuré
+- [ ] Cron job configuré pour l'export automatique
+- [ ] Historisation des workflows activée (`ENABLE_HISTORY=true`)
 - [ ] Git configuré
 - [ ] Grafana accessible, mot de passe changé
 - [ ] Script de sauvegarde configuré
