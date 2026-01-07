@@ -270,9 +270,9 @@ server {
     # ================================
     # Service Loki (push logs)
     # ================================
-    location /api/loki/ {
-        rewrite ^/api/loki/(.*) /$1 break;
-        proxy_pass http://loki:3100;
+    # Route simplifiée pour le push des logs
+    location = /api/loki/push {
+        proxy_pass http://loki:3100/loki/api/v1/push;
 
         # Headers spécifiques
         proxy_set_header Host $host;
@@ -284,7 +284,17 @@ server {
         proxy_read_timeout 60s;
 
         # Pas de logging pour éviter une boucle infinie
-        # (Promtail envoie les logs via ce proxy)
+        access_log off;
+        error_log /var/log/nginx/loki-error.log warn;
+    }
+
+    # Route générale pour les autres endpoints Loki (ready, metrics, etc.)
+    location /api/loki/ {
+        rewrite ^/api/loki/(.*) /$1 break;
+        proxy_pass http://loki:3100;
+
+        proxy_set_header Host $host;
+
         access_log off;
         error_log /var/log/nginx/loki-error.log warn;
     }
