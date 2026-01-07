@@ -8,7 +8,8 @@
 set -e
 
 # Configuration
-N8N_HOST="${N8N_HOST:-http://localhost:5678}"
+# Utilise le proxy NGINX pour avoir les logs dans Grafana
+N8N_HOST="${N8N_HOST:-http://nginx:80/api/n8n}"
 N8N_API_KEY="${N8N_API_KEY:-}"
 EXPORT_DIR="${EXPORT_DIR:-/data/n8n/workflows}"
 COMMIT_CHANGES="${COMMIT_CHANGES:-true}"
