@@ -1,0 +1,114 @@
+{
+  "export_date": "2026-01-07T12:21:26Z",
+  "workflow_count": 18,
+  "workflows": [
+  {
+    "id": "srOnR8PAY3u4RSwb",
+    "name": "Demo workflow",
+    "active": false,
+    "updatedAt": "2024-02-23T16:58:31.616Z"
+  },
+  {
+    "id": "NSySTjcSvLewMF1T",
+    "name": "ComfyUI - Webhook -> Générer -> Poll -> Télécharger -> Sauver",
+    "active": true,
+    "updatedAt": "2025-12-15T14:01:52.413Z"
+  },
+  {
+    "id": "bbwz14mmQabpS5s5",
+    "name": "Claude + Supabase",
+    "active": false,
+    "updatedAt": "2025-12-16T20:02:57.046Z"
+  },
+  {
+    "id": "J9YbrYbTjLquDBdt",
+    "name": "BanqueFlow",
+    "active": true,
+    "updatedAt": "2025-12-17T09:02:59.300Z"
+  },
+  {
+    "id": "f8tiokBXgRDzPGVO",
+    "name": "My workflow",
+    "active": false,
+    "updatedAt": "2025-12-16T21:12:37.793Z"
+  },
+  {
+    "id": "IaQql2Rc0mVpvRYx",
+    "name": "My Sub-workflow test",
+    "active": true,
+    "updatedAt": "2025-12-16T20:04:13.003Z"
+  },
+  {
+    "id": "oYnCcvk1qrRrwxBl",
+    "name": "ParentWorkflow",
+    "active": false,
+    "updatedAt": "2025-12-17T08:37:41.260Z"
+  },
+  {
+    "id": "yQNhkKHdRM71IFvO",
+    "name": "ChildAgent",
+    "active": true,
+    "updatedAt": "2025-12-18T13:06:33.238Z"
+  },
+  {
+    "id": "jqPaKqVLeU843ScZ",
+    "name": "ParentWorkflow2",
+    "active": false,
+    "updatedAt": "2025-12-17T09:20:27.107Z"
+  },
+  {
+    "id": "kIbIcervguzqOkx4",
+    "name": "ParentWorkflow3",
+    "active": false,
+    "updatedAt": "2025-12-22T17:37:49.999Z"
+  },
+  {
+    "id": "VPBoSKavqIWQEcbn",
+    "name": "Workflow Template",
+    "active": false,
+    "updatedAt": "2025-12-17T10:24:23.646Z"
+  },
+  {
+    "id": "OpJjYWvzi16RCAiy",
+    "name": "My Sub-workflow",
+    "active": true,
+    "updatedAt": "2025-12-17T12:29:44.065Z"
+  },
+  {
+    "id": "lLSKvqmpw0A8yYdR",
+    "name": "AccountAgent",
+    "active": true,
+    "updatedAt": "2025-12-22T15:25:55.401Z"
+  },
+  {
+    "id": "lNFimb2FNuY5VxCo",
+    "name": "Projet001_Orchestrator",
+    "active": false,
+    "updatedAt": "2026-01-07T12:17:07.091Z"
+  },
+  {
+    "id": "MLXJacwoL1xIM4wx",
+    "name": "Projet001_AgentSubWorkflow",
+    "active": true,
+    "updatedAt": "2025-12-27T12:46:39.235Z"
+  },
+  {
+    "id": "xZv7P69LP5o9XsbL",
+    "name": "Projet001_SubWorkflow",
+    "active": true,
+    "updatedAt": "2025-12-27T12:49:20.837Z"
+  },
+  {
+    "id": "Am07c6EXJwNRgc2p",
+    "name": "Projet001_Logger",
+    "active": true,
+    "updatedAt": "2026-01-07T12:17:36.855Z"
+  },
+  {
+    "id": "T9flKT6C7HxzTKuv",
+    "name": "Projet001_Analytics",
+    "active": false,
+    "updatedAt": "2026-01-03T17:44:13.532Z"
+  }
+]
+}

@@ -13,6 +13,11 @@ N8N_HOST="${N8N_HOST:-http://localhost:8080/api/n8n}"
 N8N_API_KEY="${N8N_API_KEY:-}"
 EXPORT_DIR="${EXPORT_DIR:-./n8n/workflows}"
 COMMIT_CHANGES="${COMMIT_CHANGES:-true}"
+# Historisation : garder une copie horodatée à chaque export
+ENABLE_HISTORY="${ENABLE_HISTORY:-true}"
+HISTORY_DIR="${HISTORY_DIR:-$EXPORT_DIR/history}"
+# Nombre d'historiques à conserver (0 = illimité)
+HISTORY_RETENTION="${HISTORY_RETENTION:-10}"
 
 # Couleurs pour les logs
 RED='\033[0;31m'
@@ -157,6 +162,41 @@ EOF
 
 log "✓ Fichier index créé: $EXPORT_DIR/index.json"
 
+# Historisation des workflows (si activé)
+if [ "$ENABLE_HISTORY" = "true" ]; then
+    log "Création de l'historique..."
+
+    # Créer le dossier d'historique avec timestamp
+    TIMESTAMP=$(date +'%Y-%m-%d_%H-%M-%S')
+    SNAPSHOT_DIR="$HISTORY_DIR/$TIMESTAMP"
+    mkdir -p "$SNAPSHOT_DIR"
+
+    # Copier tous les fichiers JSON (sauf le dossier history lui-même)
+    for file in "$EXPORT_DIR"/*.json; do
+        if [ -f "$file" ]; then
+            cp "$file" "$SNAPSHOT_DIR/"
+        fi
+    done
+
+    log "✓ Historique créé: $SNAPSHOT_DIR"
+
+    # Nettoyage des anciens historiques (si retention > 0)
+    if [ "$HISTORY_RETENTION" -gt 0 ]; then
+        HISTORY_COUNT=$(ls -1d "$HISTORY_DIR"/*/ 2>/dev/null | wc -l | tr -d ' ')
+
+        if [ "$HISTORY_COUNT" -gt "$HISTORY_RETENTION" ]; then
+            DELETE_COUNT=$((HISTORY_COUNT - HISTORY_RETENTION))
+            info "Nettoyage: suppression de $DELETE_COUNT ancien(s) historique(s)..."
+
+            # Supprimer les plus anciens (triés par nom = date)
+            ls -1d "$HISTORY_DIR"/*/ 2>/dev/null | head -n "$DELETE_COUNT" | while read -r old_dir; do
+                rm -rf "$old_dir"
+                info "✓ Supprimé: $(basename "$old_dir")"
+            done
+        fi
+    fi
+fi
+
 # Commit automatique des changements (si activé)
 if [ "$COMMIT_CHANGES" = "true" ]; then
     log "Commit des changements dans Git..."
@@ -165,6 +205,10 @@ if [ "$COMMIT_CHANGES" = "true" ]; then
 
     # Ajouter tous les fichiers JSON (nouveaux et modifiés)
     git add "$EXPORT_DIR"/*.json 2>/dev/null || true
+    # Ajouter l'historique si activé
+    if [ "$ENABLE_HISTORY" = "true" ] && [ -d "$HISTORY_DIR" ]; then
+        git add "$HISTORY_DIR" 2>/dev/null || true
+    fi
 
     # Vérifier s'il y a des changements à committer
     if git diff --staged --quiet; then

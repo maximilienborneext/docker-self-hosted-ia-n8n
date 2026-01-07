@@ -26,9 +26,14 @@ L'export automatique permet de :
 ```
 n8n/workflows/
 ├── index.json                    # Métadonnées de tous les workflows
-├── 1_Mon_premier_workflow.json   # Workflow ID 1
-├── 2_Integration_Ollama.json     # Workflow ID 2
-└── ...
+├── {id}_workflow_name.json       # Fichiers de workflows
+├── ...
+└── history/                      # Historique des exports
+    ├── 2026-01-07_10-30-00/      # Snapshot horodaté
+    │   ├── index.json
+    │   └── *.json
+    ├── 2026-01-07_16-30-00/
+    └── ...
 ```
 
 ---
@@ -80,10 +85,13 @@ Workflows exportés dans n8n/workflows/
 
 | Variable | Description | Défaut |
 |----------|-------------|--------|
-| `N8N_HOST` | URL de N8N | `http://localhost:5678` |
+| `N8N_HOST` | URL de N8N | `http://localhost:8080/api/n8n` |
 | `N8N_API_KEY` | Clé API N8N | **(requis)** |
 | `EXPORT_DIR` | Dossier destination | `./n8n/workflows` |
 | `COMMIT_CHANGES` | Commit auto Git | `true` |
+| `ENABLE_HISTORY` | Activer l'historisation | `true` |
+| `HISTORY_DIR` | Dossier des archives | `./n8n/workflows/history` |
+| `HISTORY_RETENTION` | Nombre d'historiques à garder | `10` |
 
 **Exemple avec options :**
 ```bash
@@ -146,6 +154,45 @@ Créer `~/Library/LaunchAgents/com.n8n.workflow-export.plist` :
 
 ```bash
 launchctl load ~/Library/LaunchAgents/com.n8n.workflow-export.plist
+```
+
+---
+
+## Historisation
+
+À chaque export, une copie horodatée est sauvegardée dans `history/`.
+
+### Fonctionnement
+
+- Activé par défaut (`ENABLE_HISTORY=true`)
+- Crée un dossier `YYYY-MM-DD_HH-MM-SS` à chaque export
+- Conserve les 10 derniers exports (configurable via `HISTORY_RETENTION`)
+- Les anciens historiques sont automatiquement supprimés
+
+### Désactiver l'historisation
+
+```bash
+ENABLE_HISTORY=false ./scripts/export-n8n-workflows.sh
+```
+
+### Modifier la rétention
+
+```bash
+# Garder 20 historiques
+HISTORY_RETENTION=20 ./scripts/export-n8n-workflows.sh
+
+# Garder tous les historiques (illimité)
+HISTORY_RETENTION=0 ./scripts/export-n8n-workflows.sh
+```
+
+### Restaurer depuis l'historique
+
+```bash
+# Lister les historiques disponibles
+ls -la n8n/workflows/history/
+
+# Restaurer un workflow spécifique
+cp n8n/workflows/history/2026-01-07_10-30-00/workflow.json n8n/workflows/
 ```
 
 ---

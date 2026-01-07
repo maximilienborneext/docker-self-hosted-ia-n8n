@@ -1,0 +1,1808 @@
+{
+  "updatedAt": "2026-01-07T12:17:07.091Z",
+  "createdAt": "2025-12-22T17:38:29.699Z",
+  "id": "lNFimb2FNuY5VxCo",
+  "name": "Projet001_Orchestrator",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -576,
+        -608
+      ],
+      "id": "5c13a141-ff23-4f07-879b-530d9307b946",
+      "name": "When chat message received",
+      "webhookId": "4dc6a659-4036-45fc-8354-0ee51701ee99"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"chatInputFromData\": {{ $json.chatInput }}\n}\n",
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -368,
+        -608
+      ],
+      "id": "74d538ea-ae77-4dbf-b5aa-d14a8f443500",
+      "name": "data"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"chatInputFromDataUpdated2\": {{ $json.chatInputFromData }}\n}\n",
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -160,
+        -608
+      ],
+      "id": "ed318750-e989-4dbb-808c-2e4fa7a8ce72",
+      "name": "dataUpdated"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"chatInput1\": \"{{ $json.chatInputFromData }}\",\n  \"chatInput2\": \"{{ $json.chatInputFromDataUpdated2 }}\"\n}",
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        96,
+        -608
+      ],
+      "id": "f4ed0602-a32d-4d52-8f23-e8d45110778a",
+      "name": "dataUpdated1"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "MLXJacwoL1xIM4wx",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/MLXJacwoL1xIM4wx",
+          "cachedResultName": "Projet001_AgentSubWorkflow"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "data1": "={{ $json.chatInput1 }}"
+          },
+          "matchingColumns": [
+            ""
+          ],
+          "schema": [
+            {
+              "id": "data1",
+              "displayName": "data1",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        624,
+        -176
+      ],
+      "id": "05f18c9a-6fa2-4eb9-9408-b33648bb375a",
+      "name": "Call 'AgentSubWorkflow'"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"items\": \n{{ $json.output }}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1216,
+        -608
+      ],
+      "id": "f8010224-9798-4d61-b872-12eada673188",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Tu dois parcourir chaque objet du tableau fourni et répondre avec un seul JSON contenant la liste des utilisateurs\n\nDonnées à traiter :\n{{ JSON.stringify($json) }}\n\n\nFormat de sortie attendu :\n- Un JSON avec les différent external name du tableay\n\n\n\n",
+        "options": {
+          "systemMessage": "Tu dois boucler dans le tabeau recu"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1792,
+        -608
+      ],
+      "id": "fbf36eae-af94-401c-b093-53240d5846c2",
+      "name": "Orchestrtor"
+    },
+    {
+      "parameters": {
+        "jsCode": "var test = `[\n  {\n    \"external_name\": \"Maximilien_Borne\"\n  },\n  {\n    \"external_name\": \"Max_borne_2\"\n  }\n]`;\n\nconst users = JSON.parse(test);\n\nreturn users.map(user => ({\n  json: {\n    name: user.external_name,\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -352,
+        720
+      ],
+      "id": "8f2018c8-2afe-4f10-9817-f1c16b65a28c",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "xZv7P69LP5o9XsbL",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/xZv7P69LP5o9XsbL",
+          "cachedResultName": "Projet001_SubWorkflow"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "data1": "={{ $json.name }}"
+          },
+          "matchingColumns": [
+            "data1"
+          ],
+          "schema": [
+            {
+              "id": "data1",
+              "displayName": "data1",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -112,
+        720
+      ],
+      "id": "e95ecaea-a5f2-4817-af9b-7622e32ac9e5",
+      "name": "Call 'AgentSubWorkflow'1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        1568,
+        -336
+      ],
+      "id": "47e31e9b-0461-4ed3-9d0a-6216cda2e055",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "q0SovBRAM8uAguqi",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        448,
+        -144
+      ],
+      "id": "a83a4101-56ff-4841-ba64-37d45822cfe1",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        176,
+        -176
+      ],
+      "id": "51619423-810f-40cc-ab60-7c0f9c4c25c0",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "q0SovBRAM8uAguqi",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "\n\nconst items = $input.first().json.items; // ← tableau complet\n\nreturn items.map(user => ({\n  json: {\n    name: user.external_name\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1424,
+        -608
+      ],
+      "id": "a7d25574-8edf-468c-9b52-56ce16848c15",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "=items",
+        "include": "specifiedFields",
+        "fieldsToInclude": "name",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1616,
+        -608
+      ],
+      "id": "be613c28-2d92-4559-866b-4c42bf70e33b",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "jsCode": "function decodeHtmlEntities(str) {\n  return (str || \"\")\n    .replace(/&nbsp;/g, \" \")\n    .replace(/&amp;/g, \"&\")\n    .replace(/&quot;/g, '\"')\n    .replace(/&#39;/g, \"'\")\n    .replace(/&lt;/g, \"<\")\n    .replace(/&gt;/g, \">\")\n    .replace(/&gt;/g, \">\")\n    .replace(/&eacute;/g, \"é\")\n    .replace(/&egrave;/g, \"è\")\n    .replace(/&ecirc;/g, \"ê\")\n    .replace(/&agrave;/g, \"à\")\n    .replace(/&acirc;/g, \"â\")\n    .replace(/&icirc;/g, \"î\")\n    .replace(/&ocirc;/g, \"ô\")\n    .replace(/&ugrave;/g, \"ù\")\n    .replace(/&ccedil;/g, \"ç\")\n    .replace(/&rsquo;/g, \"’\");\n}\n\n\nreturn $input.all().map((it) => {\n  const page = it.json;\n\n  const htmlBrut = page.body?.storage?.value ?? '';\n\n  // 👇 2. on décode les entités HTML\n  const htmlDecoded = decodeHtmlEntities(htmlBrut);\n\n  // 👇 3. ensuite seulement, on retire les balises HTML\n  const text = htmlDecoded.replace(/<[^>]+>/g, ' ').replace(/\\s+/g, ' ').trim();\n  \n\n  return {\n    json: {\n      content: text,\n      title: page.title,\n      url: 'https://francetv.atlassian.net/wiki' + (page._links?.webui ?? ''),\n      space: page.space?.key,\n      updatedAt: page.version?.when,\n      pageId: page.id,\n      type: page.type,\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3072,
+        352
+      ],
+      "id": "ded8d9aa-0c7b-4425-9e7a-cc2f65a9e9ea",
+      "name": "Transform"
+    },
+    {
+      "parameters": {
+        "jsCode": "const results = $input.first().json.results ?? [];\nreturn results.map(r => ({ json: r }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2864,
+        352
+      ],
+      "id": "0f3a5a8e-fbfd-4c62-9efa-5a90af314a84",
+      "name": "Split"
+    },
+    {
+      "parameters": {
+        "jsCode": "const out = [];\nconst CHUNK_SIZE = 1000;\nconst OVERLAP = 150;\n\nfor (const it of $input.all()) {\n  const j = it.json;\n  const text = (j.content || \"\").trim();\n  if (!text) continue;\n\n  let start = 0;\n  let idx = 0;\n\n  while (start < text.length) {\n    const end = Math.min(start + CHUNK_SIZE, text.length);\n    const chunk = text.slice(start, end).trim();\n\n    if (chunk.length > 0) {\n      out.push({\n        json: {\n          ...j,              // garde title/url/pageId/space/etc.\n          content: chunk,    // remplace par le chunk\n          chunkIndex: idx,\n        }\n      });\n      idx += 1;\n    }\n\n    start += (CHUNK_SIZE - OVERLAP);\n    if (CHUNK_SIZE - OVERLAP <= 0) break; // sécurité\n  }\n}\n\nreturn out;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3552,
+        352
+      ],
+      "id": "98a7b2f9-d2cc-4c8c-acaf-989c92c9765b",
+      "name": "Chunkisation"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "/rag-ask",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -144,
+        1472
+      ],
+      "id": "00140d73-f873-4edd-b5b3-5e354d393a99",
+      "name": "Webhook",
+      "webhookId": "521e8f93-c6b3-4d85-a1a1-364bb35b2801"
+    },
+    {
+      "parameters": {
+        "jsCode": "const j = $input.first().json;\n\nreturn [{\n  json: {\n    start: j.start,\n    limit: j.limit,\n    size: j.size,\n    results: j.results || [],\n    nextUrl: j._links?.next ? `https://francetv.atlassian.net/wiki${j._links.next}` : null,\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2128,
+        480
+      ],
+      "id": "e125882e-1f27-412b-8bf7-135baed6657f",
+      "name": "URL paginer"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fc3b24b0-1aa4-49e0-936e-8fa1d4cad5a9",
+              "name": "nextUrl",
+              "value": "={{ $json.nextUrl }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2336,
+        480
+      ],
+      "id": "2e3c2f50-d976-456b-af01-2074a4b6285a",
+      "name": "(SET) Next URL"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "f1041a9e-c79b-4b00-a46c-d8efd2ffa43d",
+              "leftValue": "={{ $json.nextUrl }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2624,
+        480
+      ],
+      "id": "06b30e5f-0899-46bf-b4c4-cb09bbf74c6a",
+      "name": "If (Page Exist)"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "52842200-c544-4148-88c0-b49e8fde5234",
+              "name": "nextUrl",
+              "value": "={{ $('If (Page Exist)').item.json.nextUrl }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3264,
+        352
+      ],
+      "id": "49d9f66a-5459-4df8-b217-c128e222f84e",
+      "name": "(SET) Next URL1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "4893c1af-3490-4950-bfb0-febf852e6226",
+              "leftValue": "={{$json.content.length}}",
+              "rightValue": 50,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            },
+            {
+              "id": "4bd445eb-0ee3-481f-a565-c7fbbbb83181",
+              "leftValue": "",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        3776,
+        352
+      ],
+      "id": "51c9ba96-3ab7-45b9-8c44-0e3c64f27a00",
+      "name": "If (Pertinent Content)"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e31209b2-d3be-4272-b7f1-78a5df0549bd",
+              "name": "page_id",
+              "value": "={{ $('If (Pertinent Content)').item.json.pageId }}",
+              "type": "string"
+            },
+            {
+              "id": "51b1e630-8dc6-4a94-8c1d-5cf4a33bc10f",
+              "name": "chunk_index",
+              "value": "={{ $('If (Pertinent Content)').item.json.chunkIndex }}",
+              "type": "number"
+            },
+            {
+              "id": "f2c363eb-6a05-4205-807f-0950bca850ce",
+              "name": "title",
+              "value": "={{ $('If (Pertinent Content)').item.json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "e6ca1e90-c01e-4c56-81d0-1c3e90f51528",
+              "name": "url",
+              "value": "={{ $('If (Pertinent Content)').item.json.url }}",
+              "type": "string"
+            },
+            {
+              "id": "e886457c-079e-41a2-8bfe-caa5f6814e50",
+              "name": "space",
+              "value": "={{ $('If (Pertinent Content)').item.json.space }}",
+              "type": "string"
+            },
+            {
+              "id": "dce7a12a-fd17-4021-a03d-1770e2a74af5",
+              "name": "updated_at",
+              "value": "={{ $('If (Pertinent Content)').item.json.updatedAt }}",
+              "type": "string"
+            },
+            {
+              "id": "b4f2670a-9e66-4092-9395-2d0bfedf7c10",
+              "name": "content",
+              "value": "={{ $('If (Pertinent Content)').item.json.content }}",
+              "type": "string"
+            },
+            {
+              "id": "2db65b58-0e5d-47ce-ae3b-bb06ddf90c76",
+              "name": "embedding",
+              "value": "={{ $json.embedding }}",
+              "type": "array"
+            },
+            {
+              "id": "275d052c-3daa-4e0a-b766-77fc5d1ba3a3",
+              "name": "metadata",
+              "value": "=",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4416,
+        336
+      ],
+      "id": "098f64ed-83a4-481d-9d7a-16ec86f7f777",
+      "name": "Confluence Payload to Save"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst chunk = $input.first().json;\n\n// embedding renvoyé par Ollama (déjà dans chunk.embedding si tu l'as set correctement)\nconst vector = chunk.embedding;\n\n// ✅ id Qdrant: entier unique (pageId * 100000 + chunkIndex)\n\nconst pageId = Number(chunk.page_id ?? chunk.pageId);\nconst chunkIndex = Number(chunk.chunk_index ?? chunk.chunkIndex);\n\nconst id = Number(`${pageId}${String(chunkIndex).padStart(5, '0')}`);\n\nreturn [\n  {\n    json: {\n      id,          // ✅ number (pas string)\n      vector,      // ✅ array de floats\n      payload: {   // ✅ objet\n        page_id: chunk.page_id,\n        chunk_index: chunk.chunk_index,\n        title: chunk.title,\n        url: chunk.url,\n        space: chunk.space,\n        updated_at: chunk.updated_at,\n        content: chunk.content,\n        nextUrl: $('If (Pertinent Content)').first().json.nextUrl,\n        source: \"confluence\",\n      },\n    },\n  },\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4640,
+        336
+      ],
+      "id": "a842753d-dabb-4993-b21b-c1b2f2b6c8a9",
+      "name": "Append Vector in Payload"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://nginx:80/api/supabase/confluence_chunks?on_conflict=page_id,chunk_index",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "sb_publishable_T1zKEEVa3fizfGR0MKDE3A_jj5gzYMB"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNldmxrY2p1dG5scm56aWZyZW94Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NTc4MjUyNiwiZXhwIjoyMDgxMzU4NTI2fQ.47Pj-wkPeXAzFkVrptB40ML4nUHVkcv9DbcYiUaL4GU"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "resolution=merge-duplicates,return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "page_id",
+              "value": "={{$json.payload.page_id}}"
+            },
+            {
+              "name": "chunk_index",
+              "value": "={{$json.payload.chunk_index}}"
+            },
+            {
+              "name": "title",
+              "value": "={{$json.payload.title}}"
+            },
+            {
+              "name": "url",
+              "value": "={{$json.payload.url}}"
+            },
+            {
+              "name": "space",
+              "value": "={{$json.payload.space}}"
+            },
+            {
+              "name": "updated_at",
+              "value": "={{$json.payload.updated_at}}"
+            },
+            {
+              "name": "content",
+              "value": "={{$json.payload.content}}"
+            },
+            {
+              "name": "embedding",
+              "value": "=[{{ $json.vector }}]"
+            },
+            {
+              "name": "metadata",
+              "value": "{ source: \"confluence\" }"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        4896,
+        336
+      ],
+      "id": "a90d77f3-1d92-47b2-bfae-b9886cff9520",
+      "name": "(POST) Supabase Data Request"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://nginx:80/api/ollama/api/embeddings",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "nomic-embed-text"
+            },
+            {
+              "name": "prompt",
+              "value": "={{$json.content}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        4112,
+        336
+      ],
+      "id": "f3f15f39-a83e-4e4d-bbd6-8dce30bbba9f",
+      "name": "(POST) Ollama Embeding Request"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.nextUrl }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1904,
+        480
+      ],
+      "id": "4e6de6d4-8a00-412b-9a97-b4e393b1241c",
+      "name": "(GET) Confluence Content Request",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "44yVyMB37zSDiZuA",
+          "name": "Unnamed credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0a732814-3823-4ced-8f0a-f7cd019ff570",
+              "name": "nextUrl",
+              "value": "={{ $('Append Vector in Payload').item.json.payload.nextUrl }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        5840,
+        672
+      ],
+      "id": "90fba1d2-f0b3-4483-ae05-3b7b16b8af3b",
+      "name": "(SET) Next URL2"
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "http://nginx:80/api/qdrant/collections/confluence_chunks/points?wait=true",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  points: [\n    {\n      id: $json.id,\n      vector: $json.vector,\n      payload: $json.payload\n    }\n  ]\n}) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        4912,
+        0
+      ],
+      "id": "a8ffe518-de19-491b-ba46-c178f0d7aeb0",
+      "name": "(POST) Qdrant Data Request"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0136901a-e105-4ff3-9c27-819eff418166",
+              "name": "query_text",
+              "value": "={{ $json.body.question }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        144,
+        1472
+      ],
+      "id": "382711f2-bce4-43e9-89ea-f2c3d51c9cd0",
+      "name": "(SET) Get Question from Webhook"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://nginx:80/api/ollama/api/embeddings",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"nomic-embed-text\",\n  \"prompt\": \"={{$json.query_text}}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        448,
+        1472
+      ],
+      "id": "61b8227b-4551-4c7a-9540-9a7f58699854",
+      "name": "(POST) Question Vector Request"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://nginx:80/api/supabase/rpc/match_confluence_chunks",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "sb_publishable_T1zKEEVa3fizfGR0MKDE3A_jj5gzYMB"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNldmxrY2p1dG5scm56aWZyZW94Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NTc4MjUyNiwiZXhwIjoyMDgxMzU4NTI2fQ.47Pj-wkPeXAzFkVrptB40ML4nUHVkcv9DbcYiUaL4GU"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  query_embedding: $json.embedding,\n  match_count: 8,\n  filter_space: \"IPSMART\"\n}) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        928,
+        1312
+      ],
+      "id": "13c45646-9547-46c9-85d2-4e6fa4f3566e",
+      "name": "(POST) Compare Vector in Supabase"
+    },
+    {
+      "parameters": {
+        "jsCode": "const rows = $input.all().map(i => i.json);\n\n// Option: filtrer les chunks trop faibles\nconst filtered = rows.filter(r => (r.similarity ?? 0) >= 0.2);\n\nconst context = filtered\n  .map(r => `TITLE: ${r.title}\\nURL: ${r.url}\\nCONTENT:\\n${r.content}`)\n  .join(\"\\n\\n---\\n\\n\");\n\nreturn [{\n  json: {\n    question: $('(SET) Get Question from Webhook').first().json.query_text,\n    context\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1296,
+        1472
+      ],
+      "id": "0fcb496b-b303-403f-afbc-47404598a5e9",
+      "name": "Prompt Preparation"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://nginx:80/api/ollama/api/generate",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{\n  JSON.stringify({\n    model: \"deepseek-r1:8b\",\n    prompt: `Tu es un assistant interne. Réponds uniquement à partir du CONTEXTE.\nSi l'info n'est pas dans le contexte, demande une clarification sur le sujet.\n\nQUESTION:\n${$json.question}\n\nCONTEXTE:\n${$json.context}\n\nRÉPONSE:`,\n    stream: false\n  })\n}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1760,
+        1472
+      ],
+      "id": "5755a92b-9515-45e6-8e86-9dcce6f2913c",
+      "name": "(POST) Generate Answer From Ollama"
+    },
+    {
+      "parameters": {
+        "content": "## RAG Confluence\nRécupération des contenus du Confluence FTV",
+        "height": 880,
+        "width": 4704,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        960,
+        176
+      ],
+      "id": "01d0e0d3-9ec1-4b8d-a46e-0494cde30e53",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## LLM Confluence\n",
+        "height": 768,
+        "width": 2816,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -272,
+        1216
+      ],
+      "id": "5fe22203-f365-4720-9db2-d2d83a81d2cc",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Utilisation des Sub Worfklow (hors Agent IA)\n",
+        "height": 320,
+        "width": 656,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -448,
+        592
+      ],
+      "id": "f8228174-5041-47d0-8eb7-d88659872a7d",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Utilisation des Sub Worfklow (Agent IA)\n",
+        "height": 688,
+        "width": 1632
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -736,
+        -704
+      ],
+      "id": "3ae27593-9b23-4edd-83d4-335c39cd5de6",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=tu dois transmettre les valeurs suivantes :\n\n{{ $json.output }}",
+        "options": {
+          "systemMessage": "Tu as accès à un tool nommé \"AgentSubWorkflow\", tu dois l'executer à chaque prompt que tu recois;\n\nTu as accès à un sous agent nommé \"SubAgent\", une fois que le tool AgentSubWorkflow a fini son execution, tu peux executer le sous agent SubAgent\"\n\nRÈGLE DE SORTIE (OBLIGATOIRE) :\nTu dois répondre UNIQUEMENT avec un JSON valide.\nAucun texte avant ou après. Pas de markdown. Pas de phrase du type \"La réponse finale est\".\nLe JSON doit être exactement au format :\n\n{\n  \"output\": \"string\",\n  \"sub_workflow_value\": \"string|null\",\n \"external_name\":  \"string|null\",\n  \"id_telegram\":  \"string|null\"\n}\n\nIl peut y avoir plusieurs élément dans le JSON, cela peut etre un tableau d'objet\n\nSi tu n'as pas de valeur, mets null.\n\n\nSI tu recois une valeur qui n'est pas NULL, il faut que tu execute l'agent Test en passant dans le prompt la valeur recu dans le output\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        304,
+        -608
+      ],
+      "id": "995b07f3-b9fb-4c4a-959b-4c75352e5cb4",
+      "name": "UserAgent",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -336,
+        -1088
+      ],
+      "id": "890e0a79-96c7-45f0-8f3f-4f9164402b60",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "tezt",
+        "tableName": {
+          "__rl": true,
+          "value": "confluence_chunks",
+          "mode": "list",
+          "cachedResultName": "confluence_chunks"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        -960
+      ],
+      "id": "b47ccf75-86e4-4f16-8bcb-4659b84572a5",
+      "name": "Supabase Vector Store1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "h7LAli2C03QNpkjp",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "deepseek-r1:8b"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
+      "typeVersion": 1,
+      "position": [
+        32,
+        -800
+      ],
+      "id": "407a2bd9-2f72-4698-a020-7a41f1184cb1",
+      "name": "Embeddings Ollama1",
+      "credentials": {
+        "ollamaApi": {
+          "id": "6l4JjfOyCB2Uk6dI",
+          "name": "Ollama account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -336,
+        -880
+      ],
+      "id": "98e3ebee-b9d4-45d2-ad75-74bb1f4b2143",
+      "name": "OpenAI Chat Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "q0SovBRAM8uAguqi",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        512,
+        864
+      ],
+      "id": "fc1705f3-427c-4da2-b8e7-e0ee6ff70675",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://nginx:80/api/qdrant/collections/confluence_chunks/points/search",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{\nJSON.stringify({\n  vector: $json.embedding,\n  limit: 8,\n  with_payload: true,\n  with_vector: false,\n  filter: {\n    must: [\n      { key: \"space\", match: { value: \"IPSMART\" } }\n    ]\n  }\n})\n}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        928,
+        1776
+      ],
+      "id": "7994e13c-940e-414a-bdbb-1f86922177ed",
+      "name": "(POST) Compare Vector in Qdrant"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a80f82e9-a53f-4b7e-875f-e0eaccfe613e",
+              "name": "context",
+              "value": "={{$json.context}}",
+              "type": "string"
+            },
+            {
+              "id": "2edb6c99-ab73-4353-a6e3-d69711d538e6",
+              "name": "answer",
+              "value": "={{$json.response}}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1968,
+        1472
+      ],
+      "id": "185777c7-e791-4007-a172-8ef3132c21cb",
+      "name": "Set Context (Memory)"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "Am07c6EXJwNRgc2p",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/Am07c6EXJwNRgc2p",
+          "cachedResultName": "Projet001_Logger"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "project": "Confluence-RAG-Evals",
+            "question": "={{ $('Prompt Preparation').item.json.question }}",
+            "answer": "={{ $json.answer }}",
+            "context": "={{ $('Prompt Preparation').item.json.context }}",
+            "metadata": "{ source: \"confluence\", space: \"IPSMART\" }"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "project",
+              "displayName": "project",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "question",
+              "displayName": "question",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "answer",
+              "displayName": "answer",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "context",
+              "displayName": "context",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "metadata",
+              "displayName": "metadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        2176,
+        1472
+      ],
+      "id": "a5276adf-6adb-40b0-b8bc-749d36169791",
+      "name": "Call 'Projet001_Logger'"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "dcfda185-10b2-48b4-9b14-afdeb812efb2",
+              "name": "nextUrl",
+              "value": "https://francetv.atlassian.net/wiki/rest/api/content/search?cql=space=\"IPSMART\"%20AND%20type=page&limit=50&expand=body.storage,title,version,space,_links",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1408,
+        864
+      ],
+      "id": "b1cf146d-5d85-4788-affb-949eb6a482bf",
+      "name": "Set Next URL"
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first();\nconsole.log(JSON.stringify({\n  type: \"n8n_workflow_action\",\n  workflow: item?.json?.workflow ?? \"unknown_workflow\",\n  executionId: $execution.id,\n  timestamp: Date.now(),\n  data: item?.json ?? null\n}));\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2144,
+        -608
+      ],
+      "id": "c99ba049-6c49-403d-ab24-c2f12e513437",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://nginx:80/api/loki/push",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"streams\": [\n    {\n      \"stream\": {\n        \"app\": \"n8n-test\",\n        \"env\": \"local\"\n      },\n      \"values\": [\n        [\n          \"{{ (Date.now() * 1000000).toString() }}\",\n          \"HELLO_LOKI_TEST\"\n        ]\n      ]\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        752,
+        864
+      ],
+      "id": "d7cc666d-5828-43e8-92e5-c647d918c7d2",
+      "name": "SystemLogs"
+    }
+  ],
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "data": {
+      "main": [
+        [
+          {
+            "node": "dataUpdated",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "dataUpdated": {
+      "main": [
+        [
+          {
+            "node": "dataUpdated1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "dataUpdated1": {
+      "main": [
+        [
+          {
+            "node": "UserAgent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'AgentSubWorkflow'": {
+      "ai_tool": [
+        [
+          {
+            "node": "UserAgent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Call 'AgentSubWorkflow'1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'AgentSubWorkflow'1": {
+      "main": [
+        []
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Orchestrtor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "UserAgent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "UserAgent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Orchestrtor": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Orchestrtor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split": {
+      "main": [
+        [
+          {
+            "node": "Transform",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform": {
+      "main": [
+        [
+          {
+            "node": "(SET) Next URL1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chunkisation": {
+      "main": [
+        [
+          {
+            "node": "If (Pertinent Content)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "(SET) Get Question from Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "URL paginer": {
+      "main": [
+        [
+          {
+            "node": "(SET) Next URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "(SET) Next URL": {
+      "main": [
+        [
+          {
+            "node": "If (Page Exist)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If (Page Exist)": {
+      "main": [
+        [
+          {
+            "node": "Split",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "(SET) Next URL1": {
+      "main": [
+        [
+          {
+            "node": "Chunkisation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If (Pertinent Content)": {
+      "main": [
+        [
+          {
+            "node": "(POST) Ollama Embeding Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Confluence Payload to Save": {
+      "main": [
+        [
+          {
+            "node": "Append Vector in Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append Vector in Payload": {
+      "main": [
+        [
+          {
+            "node": "(POST) Supabase Data Request",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "(POST) Qdrant Data Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "(POST) Supabase Data Request": {
+      "main": [
+        [
+          {
+            "node": "(SET) Next URL2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "(POST) Ollama Embeding Request": {
+      "main": [
+        [
+          {
+            "node": "Confluence Payload to Save",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "(GET) Confluence Content Request": {
+      "main": [
+        [
+          {
+            "node": "URL paginer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "(SET) Next URL2": {
+      "main": [
+        [
+          {
+            "node": "(GET) Confluence Content Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "(POST) Qdrant Data Request": {
+      "main": [
+        [
+          {
+            "node": "(SET) Next URL2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "(SET) Get Question from Webhook": {
+      "main": [
+        [
+          {
+            "node": "(POST) Question Vector Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "(POST) Question Vector Request": {
+      "main": [
+        [
+          {
+            "node": "(POST) Compare Vector in Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "(POST) Compare Vector in Supabase": {
+      "main": [
+        [
+          {
+            "node": "Prompt Preparation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prompt Preparation": {
+      "main": [
+        [
+          {
+            "node": "(POST) Generate Answer From Ollama",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "UserAgent": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Ollama1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "SystemLogs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "(POST) Compare Vector in Qdrant": {
+      "main": [
+        []
+      ]
+    },
+    "(POST) Generate Answer From Ollama": {
+      "main": [
+        [
+          {
+            "node": "Set Context (Memory)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Context (Memory)": {
+      "main": [
+        [
+          {
+            "node": "Call 'Projet001_Logger'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Projet001_Logger'": {
+      "main": [
+        []
+      ]
+    },
+    "Set Next URL": {
+      "main": [
+        [
+          {
+            "node": "(GET) Confluence Content Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SystemLogs": {
+      "main": [
+        [
+          {
+            "node": "Set Next URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "0c9ed03c-3d71-4fac-9501-9cf9c5b313bc",
+  "activeVersionId": null,
+  "versionCounter": 453,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2025-12-22T17:38:29.699Z",
+      "createdAt": "2025-12-22T17:38:29.699Z",
+      "role": "workflow:owner",
+      "workflowId": "lNFimb2FNuY5VxCo",
+      "projectId": "IAHu1pQG7dfjTd27",
+      "project": {
+        "updatedAt": "2025-12-11T22:33:03.220Z",
+        "createdAt": "2025-12-11T22:31:39.471Z",
+        "id": "IAHu1pQG7dfjTd27",
+        "name": "Maximilien Borne <maximilien.borne@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "570e55b9-573e-4a41-afcc-59cd77b6ae62",
+        "projectRelations": [
+          {
+            "updatedAt": "2025-12-11T22:31:39.471Z",
+            "createdAt": "2025-12-11T22:31:39.471Z",
+            "userId": "570e55b9-573e-4a41-afcc-59cd77b6ae62",
+            "projectId": "IAHu1pQG7dfjTd27",
+            "user": {
+              "updatedAt": "2026-01-07T08:52:56.782Z",
+              "createdAt": "2025-12-11T22:31:39.257Z",
+              "id": "570e55b9-573e-4a41-afcc-59cd77b6ae62",
+              "email": "maximilien.borne@gmail.com",
+              "firstName": "Maximilien",
+              "lastName": "Borne",
+              "personalizationAnswers": null,
+              "settings": {
+                "userActivated": true,
+                "easyAIWorkflowOnboarded": true,
+                "firstSuccessfulWorkflowId": "NSySTjcSvLewMF1T",
+                "userActivatedAt": 1765806789336
+              },
+              "disabled": false,
+              "mfaEnabled": false,
+              "lastActiveAt": "2026-01-07",
+              "isPending": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tags": [
+    {
+      "updatedAt": "2026-01-02T23:32:25.288Z",
+      "createdAt": "2026-01-02T23:32:25.288Z",
+      "id": "FYmzZHngBgr5Uh7D",
+      "name": "llm"
+    },
+    {
+      "updatedAt": "2026-01-02T23:32:22.919Z",
+      "createdAt": "2026-01-02T23:32:22.919Z",
+      "id": "lkC1BKVznHYEY4k4",
+      "name": "subworfklow"
+    },
+    {
+      "updatedAt": "2026-01-02T23:32:12.203Z",
+      "createdAt": "2026-01-02T23:32:12.203Z",
+      "id": "WAeeDGivqFEPvBDo",
+      "name": "rag"
+    }
+  ],
+  "activeVersion": null
+}
