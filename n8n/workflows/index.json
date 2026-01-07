@@ -1,6 +1,6 @@
 {
-  "export_date": "2026-01-07T08:53:36Z",
-  "workflow_count": 18,
+  "export_date": "2026-01-07T09:00:55Z",
+  "workflow_count": 19,
   "workflows": [
   {
     "id": "srOnR8PAY3u4RSwb",
@@ -109,6 +109,12 @@
     "name": "Projet001_Analytics",
     "active": false,
     "updatedAt": "2026-01-03T17:44:13.532Z"
+  },
+  {
+    "id": "U9zmc6FgA9bPKWFX",
+    "name": "Auto-Export Workflows to Git",
+    "active": false,
+    "updatedAt": "2026-01-07T09:00:11.249Z"
   }
 ]
 }
