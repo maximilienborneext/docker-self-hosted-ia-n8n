@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-01-03T16:46:12.366Z",
+  "updatedAt": "2026-01-07T12:17:36.855Z",
   "createdAt": "2026-01-03T12:59:54.670Z",
   "id": "Am07c6EXJwNRgc2p",
   "name": "Projet001_Logger",
@@ -36,7 +36,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "https://api.braintrust.dev/v1/project_logs/0966c78f-481a-401a-a039-0b2e276446bd/insert",
+        "url": "http://nginx:80/api/braintrust/project_logs/0966c78f-481a-401a-a039-0b2e276446bd/insert",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
@@ -163,9 +163,9 @@
   "staticData": null,
   "meta": null,
   "pinData": {},
-  "versionId": "67f9ef5e-e7a2-4c7c-8730-2a26f89005c7",
+  "versionId": "93c2e620-843a-4928-af78-77aa1485bb84",
   "activeVersionId": "67f9ef5e-e7a2-4c7c-8730-2a26f89005c7",
-  "versionCounter": 53,
+  "versionCounter": 54,
   "triggerCount": 0,
   "shared": [
     {

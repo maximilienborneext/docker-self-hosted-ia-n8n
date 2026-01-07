@@ -1,6 +1,6 @@
 {
-  "export_date": "2026-01-07T09:00:55Z",
-  "workflow_count": 19,
+  "export_date": "2026-01-07T12:18:52Z",
+  "workflow_count": 18,
   "workflows": [
   {
     "id": "srOnR8PAY3u4RSwb",
@@ -84,7 +84,7 @@
     "id": "lNFimb2FNuY5VxCo",
     "name": "Projet001_Orchestrator",
     "active": false,
-    "updatedAt": "2026-01-06T19:53:19.404Z"
+    "updatedAt": "2026-01-07T12:17:07.091Z"
   },
   {
     "id": "MLXJacwoL1xIM4wx",
@@ -102,19 +102,13 @@
     "id": "Am07c6EXJwNRgc2p",
     "name": "Projet001_Logger",
     "active": true,
-    "updatedAt": "2026-01-03T16:46:12.366Z"
+    "updatedAt": "2026-01-07T12:17:36.855Z"
   },
   {
     "id": "T9flKT6C7HxzTKuv",
     "name": "Projet001_Analytics",
     "active": false,
     "updatedAt": "2026-01-03T17:44:13.532Z"
-  },
-  {
-    "id": "U9zmc6FgA9bPKWFX",
-    "name": "Auto-Export Workflows to Git",
-    "active": false,
-    "updatedAt": "2026-01-07T09:00:11.249Z"
   }
 ]
 }

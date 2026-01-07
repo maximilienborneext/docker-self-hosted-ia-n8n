@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-01-06T19:53:19.404Z",
+  "updatedAt": "2026-01-07T12:17:07.091Z",
   "createdAt": "2025-12-22T17:38:29.699Z",
   "id": "lNFimb2FNuY5VxCo",
   "name": "Projet001_Orchestrator",
@@ -570,7 +570,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "https://sevlkcjutnlrnzifreox.supabase.co/rest/v1/confluence_chunks?on_conflict=page_id,chunk_index",
+        "url": "http://nginx:80/api/supabase/confluence_chunks?on_conflict=page_id,chunk_index",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
@@ -647,7 +647,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "http://host.docker.internal:11434/api/embeddings",
+        "url": "http://nginx:80/api/ollama/api/embeddings",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
@@ -730,7 +730,7 @@
     {
       "parameters": {
         "method": "PUT",
-        "url": "http://host.docker.internal:6333/collections/confluence_chunks/points?wait=true",
+        "url": "http://nginx:80/api/qdrant/collections/confluence_chunks/points?wait=true",
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify({\n  points: [\n    {\n      id: $json.id,\n      vector: $json.vector,\n      payload: $json.payload\n    }\n  ]\n}) }}",
@@ -771,7 +771,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "http://host.docker.internal:11434/api/embeddings",
+        "url": "http://nginx:80/api/ollama/api/embeddings",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
@@ -798,7 +798,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "https://sevlkcjutnlrnzifreox.supabase.co/rest/v1/rpc/match_confluence_chunks",
+        "url": "http://nginx:80/api/supabase/rpc/match_confluence_chunks",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
@@ -846,7 +846,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "http://host.docker.internal:11434/api/generate",
+        "url": "http://nginx:80/api/ollama/api/generate",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
@@ -1049,7 +1049,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "http://host.docker.internal:6333/collections/confluence_chunks/points/search",
+        "url": "http://nginx:80/api/qdrant/collections/confluence_chunks/points/search",
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{\nJSON.stringify({\n  vector: $json.embedding,\n  limit: 8,\n  with_payload: true,\n  with_vector: false,\n  filter: {\n    must: [\n      { key: \"space\", match: { value: \"IPSMART\" } }\n    ]\n  }\n})\n}}",
@@ -1218,7 +1218,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "http://loki:3100/loki/api/v1/push",
+        "url": "http://nginx:80/api/loki/push",
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={\n  \"streams\": [\n    {\n      \"stream\": {\n        \"app\": \"n8n-test\",\n        \"env\": \"local\"\n      },\n      \"values\": [\n        [\n          \"{{ (Date.now() * 1000000).toString() }}\",\n          \"HELLO_LOKI_TEST\"\n        ]\n      ]\n    }\n  ]\n}",
@@ -1734,9 +1734,9 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "8a6f44ea-259c-43c4-89d8-d7a8e1478afb",
+  "versionId": "0c9ed03c-3d71-4fac-9501-9cf9c5b313bc",
   "activeVersionId": null,
-  "versionCounter": 442,
+  "versionCounter": 453,
   "triggerCount": 1,
   "shared": [
     {
@@ -1786,10 +1786,10 @@
   ],
   "tags": [
     {
-      "updatedAt": "2026-01-02T23:32:12.203Z",
-      "createdAt": "2026-01-02T23:32:12.203Z",
-      "id": "WAeeDGivqFEPvBDo",
-      "name": "rag"
+      "updatedAt": "2026-01-02T23:32:25.288Z",
+      "createdAt": "2026-01-02T23:32:25.288Z",
+      "id": "FYmzZHngBgr5Uh7D",
+      "name": "llm"
     },
     {
       "updatedAt": "2026-01-02T23:32:22.919Z",
@@ -1798,10 +1798,10 @@
       "name": "subworfklow"
     },
     {
-      "updatedAt": "2026-01-02T23:32:25.288Z",
-      "createdAt": "2026-01-02T23:32:25.288Z",
-      "id": "FYmzZHngBgr5Uh7D",
-      "name": "llm"
+      "updatedAt": "2026-01-02T23:32:12.203Z",
+      "createdAt": "2026-01-02T23:32:12.203Z",
+      "id": "WAeeDGivqFEPvBDo",
+      "name": "rag"
     }
   ],
   "activeVersion": null
