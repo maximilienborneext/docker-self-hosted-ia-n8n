@@ -162,12 +162,13 @@ if [ "$COMMIT_CHANGES" = "true" ]; then
 
     cd "$(dirname "$EXPORT_DIR")"
 
-    # Vérifier s'il y a des changements
-    if git diff --quiet "$EXPORT_DIR" && git diff --cached --quiet "$EXPORT_DIR"; then
+    # Ajouter tous les fichiers JSON (nouveaux et modifiés)
+    git add "$EXPORT_DIR"/*.json 2>/dev/null || true
+
+    # Vérifier s'il y a des changements à committer
+    if git diff --staged --quiet; then
         info "Aucun changement détecté dans les workflows"
     else
-        git add "$EXPORT_DIR"/*.json
-
         COMMIT_MSG="Auto-export N8N workflows - $(date +'%Y-%m-%d %H:%M:%S')
 
 Exported $WORKFLOW_COUNT workflows:
@@ -176,7 +177,7 @@ $(echo "$WORKFLOWS" | jq -r '.data[] | "- \(.name) (ID: \(.id))"')
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 "
 
-        git commit -m "$COMMIT_MSG" || info "Rien à committer"
+        git commit -m "$COMMIT_MSG"
 
         log "✓ Changements committés"
 
